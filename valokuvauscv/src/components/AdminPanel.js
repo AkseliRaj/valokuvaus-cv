@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
 
 const AdminPanel = ({ onLogout }) => {
@@ -8,6 +9,7 @@ const AdminPanel = ({ onLogout }) => {
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [editingPhoto, setEditingPhoto] = useState(null);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const [uploadForm, setUploadForm] = useState({
     title: '',
@@ -161,6 +163,10 @@ const AdminPanel = ({ onLogout }) => {
     onLogout();
   };
 
+  const goToGallery = () => {
+    navigate('/');
+  };
+
   if (loading) {
     return <div className="admin-loading">Loading...</div>;
   }
@@ -169,7 +175,14 @@ const AdminPanel = ({ onLogout }) => {
     <div className="admin-panel">
       <div className="admin-header">
         <h1>Admin Panel</h1>
-        <button onClick={handleLogout} className="logout-btn">Logout</button>
+        <div className="admin-header-buttons">
+          <button onClick={goToGallery} className="gallery-btn">
+            Back to Gallery
+          </button>
+          <button onClick={handleLogout} className="logout-btn">
+            Logout
+          </button>
+        </div>
       </div>
 
       {error && <div className="error-message">{error}</div>}

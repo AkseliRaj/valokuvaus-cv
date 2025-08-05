@@ -4,6 +4,8 @@
   margin: 0 auto;
   background: #4e4e4e;
   min-height: 100vh;
+  overflow-y: auto;
+  max-height: 100vh;
 }
 
 .admin-header {
@@ -97,7 +99,6 @@
   padding: 30px;
   border-radius: 10px;
   margin-bottom: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .upload-form h3 {

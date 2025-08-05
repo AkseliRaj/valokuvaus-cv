@@ -72,7 +72,6 @@ export const useDragScroll = () => {
     const newY = touch.clientY - dragStart.y;
     
     throttledUpdate({ x: newX, y: newY });
-    e.preventDefault();
   };
 
   const handleTouchEnd = () => {
@@ -81,7 +80,6 @@ export const useDragScroll = () => {
 
   // Wheel event for zoom-like scrolling
   const handleWheel = (e) => {
-    e.preventDefault();
     const deltaX = e.deltaX || 0;
     const deltaY = e.deltaY || 0;
     

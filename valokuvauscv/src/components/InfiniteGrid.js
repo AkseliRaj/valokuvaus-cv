@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import PhotoCard from './PhotoCard';
+import ImageModal from './ImageModal';
 import { basePhotos } from '../data/photoData';
 import './InfiniteGrid.css';
 
@@ -9,6 +10,8 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
   const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 });
   const lastScrollRef = useRef({ x: 0, y: 0 });
   const animationFrameRef = useRef(null);
+  const [modalPhoto, setModalPhoto] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Update scroll position without triggering re-renders
   const updateScrollPosition = useCallback((newPosition) => {
@@ -107,12 +110,34 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     };
   }, [scrollPosition]);
 
+  const handlePhotoClick = useCallback((photo) => {
+    setModalPhoto(photo);
+    setIsModalOpen(true);
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setIsModalOpen(false);
+    setModalPhoto(null);
+  }, []);
+
   return (
-    <div className="infinite-grid" ref={gridRef}>
-      {visiblePhotos.map((photo) => (
-        <PhotoCard key={photo.id} photo={photo} style={photo.style} />
-      ))}
-    </div>
+    <>
+      <div className="infinite-grid" ref={gridRef}>
+        {visiblePhotos.map((photo) => (
+          <PhotoCard 
+            key={photo.id} 
+            photo={photo} 
+            style={photo.style}
+            onPhotoClick={handlePhotoClick}
+          />
+        ))}
+      </div>
+      <ImageModal 
+        isOpen={isModalOpen}
+        photo={modalPhoto}
+        onClose={handleModalClose}
+      />
+    </>
   );
 });
 

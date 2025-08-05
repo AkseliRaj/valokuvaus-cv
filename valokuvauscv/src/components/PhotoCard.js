@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './PhotoCard.css';
 
-const PhotoCard = React.memo(({ photo, style }) => {
+const PhotoCard = React.memo(({ photo, style, onPhotoClick }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const imgRef = useRef(null);
@@ -30,9 +30,15 @@ const PhotoCard = React.memo(({ photo, style }) => {
     setIsLoaded(true);
   };
 
+  const handleClick = () => {
+    if (onPhotoClick) {
+      onPhotoClick(photo);
+    }
+  };
+
   return (
     <div className="photo-card" ref={cardRef} style={style}>
-      <div className="photo-wrapper">
+      <div className="photo-wrapper" onClick={handleClick}>
         {isVisible && (
           <img 
             ref={imgRef}

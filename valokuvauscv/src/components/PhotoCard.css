@@ -1,0 +1,124 @@
+/* Photo card styles */
+.photo-card {
+  position: absolute;
+  will-change: transform;
+  transform: translateZ(0); /* Hardware acceleration */
+}
+
+.photo-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  background-color: #f0f0f0; /* Placeholder background */
+}
+
+.photo-wrapper:hover {
+  transform: scale(1.02);
+}
+
+.photo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.photo-image.loaded {
+  opacity: 1;
+}
+
+.photo-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.photo-wrapper:hover .photo-overlay {
+  opacity: 1;
+}
+
+.photo-overlay h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.photo-overlay p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Animation for photo cards on load */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger animation for grid items */
+.photo-card:nth-child(1) { animation-delay: 0.1s; }
+.photo-card:nth-child(2) { animation-delay: 0.2s; }
+.photo-card:nth-child(3) { animation-delay: 0.3s; }
+.photo-card:nth-child(4) { animation-delay: 0.4s; }
+.photo-card:nth-child(5) { animation-delay: 0.5s; }
+.photo-card:nth-child(6) { animation-delay: 0.6s; }
+.photo-card:nth-child(7) { animation-delay: 0.7s; }
+.photo-card:nth-child(8) { animation-delay: 0.8s; }
+.photo-card:nth-child(9) { animation-delay: 0.9s; }
+.photo-card:nth-child(10) { animation-delay: 1s; }
+.photo-card:nth-child(11) { animation-delay: 1.1s; }
+.photo-card:nth-child(12) { animation-delay: 1.2s; }
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .photo-card {
+    width: 300px;
+    height: 450px;
+  }
+}
+
+@media (max-width: 480px) {
+  .photo-card {
+    width: 250px;
+    height: 375px;
+  }
+  
+  .photo-overlay {
+    padding: 1rem;
+  }
+  
+  .photo-overlay h3 {
+    font-size: 1rem;
+  }
+  
+  .photo-overlay p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Performance optimizations */
+.photo-image {
+  will-change: transform;
+}
+
+.photo-card {
+  will-change: transform;
+} 

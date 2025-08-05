@@ -12,6 +12,49 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
   const animationFrameRef = useRef(null);
   const [modalPhoto, setModalPhoto] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch photos from database
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/photos');
+        if (response.ok) {
+          const data = await response.json();
+          // Transform database photos to match the expected format
+          const transformedPhotos = data.map(photo => ({
+            id: photo.id,
+            src: `http://localhost:5000/uploads/${photo.filename}`,
+            alt: photo.title || 'Photo',
+            title: photo.title || 'Untitled',
+            description: photo.description || '',
+            // Add metadata for display
+            metadata: {
+              date: photo.date,
+              shutter_speed: photo.shutter_speed,
+              iso: photo.iso,
+              focal_length: photo.focal_length,
+              aperture: photo.aperture,
+              camera_info: photo.camera_info
+            }
+          }));
+          setPhotos(transformedPhotos);
+        } else {
+          // Fallback to static photos if API fails
+          setPhotos(basePhotos);
+        }
+      } catch (error) {
+        console.error('Failed to fetch photos:', error);
+        // Fallback to static photos
+        setPhotos(basePhotos);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPhotos();
+  }, []);
 
   // Update scroll position without triggering re-renders
   const updateScrollPosition = useCallback((newPosition) => {
@@ -29,6 +72,10 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
 
   // Calculate which photos should be visible based on viewport
   const visiblePhotos = useMemo(() => {
+    if (loading || photos.length === 0) {
+      return [];
+    }
+
     const { photoWidth, photoHeight, gap, columns } = gridConfig;
     const cellWidth = photoWidth + gap;
     const cellHeight = photoHeight + gap;
@@ -54,28 +101,30 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
         // Only add one photo per cell for better performance
-        const photoIndex = Math.abs(row + col) % basePhotos.length;
-        const photo = basePhotos[photoIndex];
+        const photoIndex = Math.abs(row + col) % photos.length;
+        const photo = photos[photoIndex];
         
-        visible.push({
-          ...photo,
-          id: `${row}-${col}-${photo.id}`,
-          gridRow: row,
-          gridCol: col,
-          originalId: photo.id,
-          style: {
-            position: 'absolute',
-            left: col * cellWidth,
-            top: row * cellHeight,
-            width: photoWidth,
-            height: photoHeight
-          }
-        });
+        if (photo) {
+          visible.push({
+            ...photo,
+            id: `${row}-${col}-${photo.id}`,
+            gridRow: row,
+            gridCol: col,
+            originalId: photo.id,
+            style: {
+              position: 'absolute',
+              left: col * cellWidth,
+              top: row * cellHeight,
+              width: photoWidth,
+              height: photoHeight
+            }
+          });
+        }
       }
     }
     
     return visible;
-  }, [gridConfig, scrollPosition, viewport]);
+  }, [gridConfig, scrollPosition, viewport, photos, loading]);
 
   // Update viewport size with more accurate calculation
   useEffect(() => {
@@ -119,6 +168,14 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     setIsModalOpen(false);
     setModalPhoto(null);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner">Loading photos...</div>
+      </div>
+    );
+  }
 
   return (
     <>

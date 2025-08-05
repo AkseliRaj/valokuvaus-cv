@@ -1,121 +1,183 @@
-# Photography Portfolio
+# Photography Portfolio with Admin Panel
 
-A beautiful React photography portfolio with a fluid masonry grid layout and infinite scrolling, inspired by Pinterest and Public Work by Cosmos.
+A modern photography portfolio website with an admin panel for managing photos and metadata. Built with React frontend and Express.js backend with SQLite database.
 
 ## Features
 
-- **Fluid Masonry Grid**: Photos are arranged in a responsive grid that adapts to different screen sizes
-- **Infinite Scrolling**: Automatically loads more photos as you scroll down
-- **Smooth Animations**: Hover effects and smooth transitions for an engaging user experience
-- **Responsive Design**: Works perfectly on desktop, tablet, and mobile devices
-- **Modern UI**: Clean, modern design with gradient backgrounds and glass-morphism effects
+### Public Gallery
+- Infinite scroll photography gallery
+- Responsive design with drag-to-scroll functionality
+- Photo modal with detailed view and metadata display
+- Photography metadata support (shutter speed, ISO, focal length, aperture, camera info)
 
-## Getting Started
+### Admin Panel
+- Secure login system
+- Upload new photos with optional metadata
+- Edit existing photos and metadata
+- Delete photos
+- View all uploaded photos in a management interface
+
+### Photography Metadata
+- Date
+- Shutter Speed
+- ISO
+- Focal Length
+- Aperture
+- Camera Information
+
+All metadata fields are optional - photos can be uploaded with just the image file.
+
+## Setup Instructions
 
 ### Prerequisites
-
 - Node.js (version 14 or higher)
 - npm or yarn
 
 ### Installation
 
-1. Clone the repository or navigate to the project directory
-2. Install dependencies:
+1. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. Start the development server:
+2. **Start the development server**
    ```bash
-   npm start
+   npm run dev
+   ```
+   This will start both the backend server (port 5000) and the React development server (port 3000).
+
+### Default Admin Credentials
+- **Username:** admin
+- **Password:** admin123
+
+**Important:** Change these credentials in production!
+
+## Usage
+
+### Accessing the Admin Panel
+
+1. Open your browser and go to `http://localhost:3000`
+2. You'll see the login screen
+3. Enter the default credentials (admin/admin123)
+4. After login, you'll see the main gallery with admin controls
+5. Click "Admin Panel" to access the photo management interface
+
+### Uploading Photos
+
+1. In the admin panel, click "Upload New Photo"
+2. Select an image file (supports: jpg, jpeg, png, gif, webp)
+3. Fill in the optional metadata fields:
+   - Title
+   - Description
+   - Date
+   - Shutter Speed (e.g., "1/1000")
+   - ISO (e.g., "100")
+   - Focal Length (e.g., "50mm")
+   - Aperture (e.g., "f/2.8")
+   - Camera Info (e.g., "Canon EOS R5")
+4. Click "Upload Photo"
+
+### Managing Photos
+
+- **Edit:** Click the "Edit" button on any photo to modify its metadata
+- **Delete:** Click the "Delete" button to remove a photo (with confirmation)
+- **View:** All uploaded photos are displayed in the admin panel with thumbnails
+
+### Public Gallery
+
+- The main gallery displays all uploaded photos in an infinite scroll layout
+- Click on any photo to view it in a modal with full metadata
+- Use drag-to-scroll or mouse wheel to navigate the gallery
+
+## File Structure
+
+```
+valokuvauscv/
+├── server/
+│   └── server.js          # Express backend server
+├── src/
+│   ├── components/
+│   │   ├── AdminPanel.js  # Admin panel component
+│   │   ├── Login.js       # Login component
+│   │   ├── ImageModal.js  # Photo modal component
+│   │   └── ...            # Other existing components
+│   ├── App.js             # Main app component
+│   └── ...                # Other existing files
+├── uploads/               # Uploaded image files (created automatically)
+├── photography.db         # SQLite database (created automatically)
+└── package.json
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/login` - Admin login
+
+### Photos
+- `GET /api/photos` - Get all photos
+- `POST /api/photos` - Upload new photo (admin only)
+- `PUT /api/photos/:id` - Update photo metadata (admin only)
+- `DELETE /api/photos/:id` - Delete photo (admin only)
+
+## Security Notes
+
+- Change the default admin password in production
+- Update the JWT_SECRET in the server configuration
+- Consider implementing rate limiting for production use
+- Ensure proper file upload validation and sanitization
+
+## Production Deployment
+
+1. **Build the React app:**
+   ```bash
+   npm run build
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+2. **Set environment variables:**
+   - `JWT_SECRET` - A secure random string
+   - `PORT` - Server port (optional, defaults to 5000)
 
-## Customizing Your Portfolio
+3. **Deploy the server:**
+   - The `server.js` file serves the built React app
+   - Ensure the `uploads` directory is writable
+   - Set up proper database backups for the SQLite file
 
-### Adding Your Own Photos
+## Troubleshooting
 
-1. **Replace Sample Photos**: In `src/App.js`, replace the `samplePhotos` array with your own photography data:
+### Common Issues
 
-```javascript
-const samplePhotos = [
-  {
-    id: 1,
-    src: '/path/to/your/photo1.jpg',
-    alt: 'Description of your photo',
-    title: 'Your Photo Title',
-    description: 'Description of your photography work'
-  },
-  // Add more photos...
-];
-```
+1. **Server won't start:**
+   - Check if port 5000 is available
+   - Ensure all dependencies are installed
 
-2. **Photo Requirements**:
-   - Use high-quality images (recommended: 800px-1200px width)
-   - Include descriptive alt text for accessibility
-   - Add meaningful titles and descriptions
-   - Supported formats: JPG, PNG, WebP
+2. **Photos not loading:**
+   - Verify the backend server is running on port 5000
+   - Check browser console for CORS errors
 
-### Styling Customization
+3. **Upload fails:**
+   - Ensure the `uploads` directory exists and is writable
+   - Check file size (10MB limit)
+   - Verify file type is supported
 
-- **Colors**: Modify the gradient colors in `src/App.css` (lines 15-16)
-- **Grid Layout**: Adjust the `breakpointColumns` object in `src/App.js` to change responsive breakpoints
-- **Animations**: Customize animation timings and effects in `src/App.css`
+4. **Login issues:**
+   - Default credentials: admin/admin123
+   - Check browser console for network errors
 
-### Performance Optimization
+### Database Reset
 
-- **Image Optimization**: Use compressed images and consider using WebP format
-- **Lazy Loading**: Images are automatically lazy-loaded for better performance
-- **Infinite Scroll**: Photos load in batches to maintain smooth scrolling
-
-## Project Structure
-
-```
-src/
-├── App.js          # Main component with masonry grid and infinite scroll
-├── App.css         # Styles for the portfolio layout and animations
-├── index.js        # React app entry point
-└── index.css       # Global styles
-```
+To reset the database and start fresh:
+1. Stop the server
+2. Delete `photography.db`
+3. Restart the server - it will create a new database with default admin user
 
 ## Technologies Used
 
-- **React**: Frontend framework
-- **react-masonry-css**: For the fluid grid layout
-- **CSS3**: For animations and responsive design
-- **Unsplash API**: For sample images (replace with your own)
-
-## Deployment
-
-To build the app for production:
-
-```bash
-npm run build
-```
-
-This creates a `build` folder with optimized production files that you can deploy to any static hosting service like:
-
-- Netlify
-- Vercel
-- GitHub Pages
-- AWS S3
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## Contributing
-
-Feel free to submit issues and enhancement requests!
+- **Frontend:** React, CSS3
+- **Backend:** Express.js, SQLite3
+- **Authentication:** JWT, bcryptjs
+- **File Upload:** Multer
+- **Database:** SQLite
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-**Note**: Replace the sample Unsplash images with your own photography work to create your personal portfolio. The current setup uses placeholder images for demonstration purposes.
+This project is open source and available under the MIT License.

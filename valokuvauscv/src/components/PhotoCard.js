@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './PhotoCard.css';
 
-const PhotoCard = React.memo(({ photo, style, onPhotoClick }) => {
+const PhotoCard = React.memo(({ photo, style, onPhotoClick, dragDistance }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const imgRef = useRef(null);
@@ -31,6 +31,11 @@ const PhotoCard = React.memo(({ photo, style, onPhotoClick }) => {
   };
 
   const handleClick = () => {
+    // Prevent click if user has dragged (moved more than 5 pixels)
+    if (dragDistance > 5) {
+      return;
+    }
+    
     if (onPhotoClick) {
       onPhotoClick(photo);
     }

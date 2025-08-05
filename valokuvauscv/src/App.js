@@ -20,6 +20,7 @@ function App() {
     getScrollPosition,
     setUpdateCallback,
     isDragging,
+    dragDistance,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
@@ -157,6 +158,7 @@ function App() {
         gridConfig={gridConfig} 
         getScrollPosition={getScrollPosition}
         setUpdateCallback={setUpdateCallback}
+        dragDistance={dragDistance}
       />
       <InstructionsOverlay />
 

@@ -4,7 +4,7 @@ import ImageModal from './ImageModal';
 import { basePhotos } from '../data/photoData';
 import './InfiniteGrid.css';
 
-const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallback }) => {
+const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallback, dragDistance }) => {
   const gridRef = useRef(null);
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
   const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 });
@@ -186,6 +186,7 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
             photo={photo} 
             style={photo.style}
             onPhotoClick={handlePhotoClick}
+            dragDistance={dragDistance}
           />
         ))}
       </div>

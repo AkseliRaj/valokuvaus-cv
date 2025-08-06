@@ -3,11 +3,9 @@ import './AdminActions.css';
 
 const AdminActions = ({ 
   showUploadForm, 
-  showCategoryForm, 
-  showFilters,
+  showCategoryForm,
   onToggleUpload, 
-  onToggleCategories, 
-  onToggleFilters 
+  onToggleCategories
 }) => {
   return (
     <div className="admin-actions">
@@ -22,12 +20,6 @@ const AdminActions = ({
         className="category-btn"
       >
         {showCategoryForm ? 'Cancel' : 'Manage Categories'}
-      </button>
-      <button 
-        onClick={onToggleFilters}
-        className="filter-btn"
-      >
-        {showFilters ? 'Hide Filters' : 'Show Filters'}
       </button>
     </div>
   );

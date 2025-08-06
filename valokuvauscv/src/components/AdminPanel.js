@@ -7,7 +7,6 @@ import AdminHeader from './AdminHeader';
 import AdminActions from './AdminActions';
 import UploadForm from './UploadForm';
 import CategoryManager from './CategoryManager';
-import FilterPanel from './FilterPanel';
 import PhotoGrid from './PhotoGrid';
 import EditPhotoModal from './EditPhotoModal';
 
@@ -276,10 +275,8 @@ const AdminPanel = ({ onLogout }) => {
       <AdminActions 
         showUploadForm={showUploadForm}
         showCategoryForm={showCategoryForm}
-        showFilters={showFilters}
         onToggleUpload={toggleUploadForm}
         onToggleCategories={toggleCategoryForm}
-        onToggleFilters={toggleFilters}
       />
 
       {showUploadForm && (
@@ -299,21 +296,17 @@ const AdminPanel = ({ onLogout }) => {
         />
       )}
 
-      {showFilters && (
-        <FilterPanel 
-          filters={filters}
-          categories={categories}
-          onFilterChange={handleFilterChange}
-          onClearFilters={clearFilters}
-          filteredCount={filteredPhotos.length}
-          totalCount={photos.length}
-        />
-      )}
-
       <PhotoGrid 
         photos={filteredPhotos}
         onEdit={setEditingPhoto}
         onDelete={handleDelete}
+        showFilters={showFilters}
+        onToggleFilters={toggleFilters}
+        filters={filters}
+        categories={categories}
+        onFilterChange={handleFilterChange}
+        onClearFilters={clearFilters}
+        totalCount={photos.length}
       />
 
       {editingPhoto && (

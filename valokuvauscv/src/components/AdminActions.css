@@ -32,13 +32,13 @@
 }
 
 .category-btn {
-  background: rgba(40, 167, 69, 0.25);
+  background: rgba(255, 255, 255, 0.25);
   color: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(40, 167, 69, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .category-btn:hover {
-  background: rgba(40, 167, 69, 0.35);
+  background: rgba(255, 255, 255, 0.35);
   color: rgba(255, 255, 255, 1);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);

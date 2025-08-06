@@ -28,7 +28,9 @@ const ImageModal = ({ isOpen, photo, onClose }) => {
     photo.metadata.iso ||
     photo.metadata.focal_length ||
     photo.metadata.aperture ||
-    photo.metadata.camera_info
+    photo.metadata.camera_info ||
+    photo.metadata.is_black_white ||
+    photo.metadata.category_name
   );
 
   return (
@@ -45,8 +47,7 @@ const ImageModal = ({ isOpen, photo, onClose }) => {
           />
         </div>
         <div className="image-modal-info">
-          <h2>{photo.title}</h2>
-          {photo.description && <p className="image-modal-description">{photo.description}</p>}
+          <h2>Photo #{photo.id}</h2>
           
           {hasMetadata && (
             <div className="image-modal-metadata">
@@ -86,6 +87,18 @@ const ImageModal = ({ isOpen, photo, onClose }) => {
                   <div className="metadata-item">
                     <span className="metadata-label">Camera:</span>
                     <span className="metadata-value">{photo.metadata.camera_info}</span>
+                  </div>
+                )}
+                {photo.metadata.is_black_white !== undefined && (
+                  <div className="metadata-item">
+                    <span className="metadata-label">Type:</span>
+                    <span className="metadata-value">{photo.metadata.is_black_white ? 'Black & White' : 'Color'}</span>
+                  </div>
+                )}
+                {photo.metadata.category_name && (
+                  <div className="metadata-item">
+                    <span className="metadata-label">Category:</span>
+                    <span className="metadata-value">{photo.metadata.category_name}</span>
                   </div>
                 )}
               </div>

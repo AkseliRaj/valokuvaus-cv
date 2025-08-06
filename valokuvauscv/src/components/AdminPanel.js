@@ -5,22 +5,37 @@ import './AdminPanel.css';
 
 const AdminPanel = ({ onLogout }) => {
   const [photos, setPhotos] = useState([]);
+  const [filteredPhotos, setFilteredPhotos] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [editingPhoto, setEditingPhoto] = useState(null);
   const [error, setError] = useState('');
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    search: '',
+    category: '',
+    photoType: '',
+    dateFrom: '',
+    dateTo: '',
+    camera: ''
+  });
+  const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
   const [uploadForm, setUploadForm] = useState({
-    title: '',
-    description: '',
     date: '',
     shutter_speed: '',
     iso: '',
     focal_length: '',
     aperture: '',
     camera_info: '',
+    is_black_white: false,
+    category_id: '',
     image: null
   });
   const [metadataExtracted, setMetadataExtracted] = useState(false);
@@ -29,6 +44,7 @@ const AdminPanel = ({ onLogout }) => {
 
   useEffect(() => {
     fetchPhotos();
+    fetchCategories();
   }, []);
 
   const fetchPhotos = async () => {
@@ -36,6 +52,7 @@ const AdminPanel = ({ onLogout }) => {
       const response = await fetch('http://localhost:5000/api/photos');
       const data = await response.json();
       setPhotos(data);
+      setFilteredPhotos(data);
     } catch (err) {
       setError('Failed to fetch photos');
     } finally {
@@ -43,14 +60,71 @@ const AdminPanel = ({ onLogout }) => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/categories');
+      const data = await response.json();
+      setCategories(data);
+    } catch (err) {
+      setError('Failed to fetch categories');
+    }
+  };
+
+  // Filter photos based on current filters
+  const filterPhotos = () => {
+    let filtered = [...photos];
+
+    // Search filter (searches in filename, camera info, and category)
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(photo => 
+        photo.filename.toLowerCase().includes(searchLower) ||
+        (photo.camera_info && photo.camera_info.toLowerCase().includes(searchLower)) ||
+        (photo.category_name && photo.category_name.toLowerCase().includes(searchLower))
+      );
+    }
+
+    // Category filter
+    if (filters.category) {
+      filtered = filtered.filter(photo => photo.category_id == filters.category);
+    }
+
+    // Photo type filter
+    if (filters.photoType) {
+      const isBlackWhite = filters.photoType === 'black_white';
+      filtered = filtered.filter(photo => photo.is_black_white == isBlackWhite);
+    }
+
+    // Date range filter
+    if (filters.dateFrom) {
+      filtered = filtered.filter(photo => photo.date >= filters.dateFrom);
+    }
+    if (filters.dateTo) {
+      filtered = filtered.filter(photo => photo.date <= filters.dateTo);
+    }
+
+    // Camera filter
+    if (filters.camera) {
+      const cameraLower = filters.camera.toLowerCase();
+      filtered = filtered.filter(photo => 
+        photo.camera_info && photo.camera_info.toLowerCase().includes(cameraLower)
+      );
+    }
+
+    setFilteredPhotos(filtered);
+  };
+
+  // Apply filters when filters change
+  useEffect(() => {
+    filterPhotos();
+  }, [filters, photos]);
+
   const extractMetadata = async (file) => {
     try {
       const exifData = await exifr.parse(file);
       
       if (exifData) {
         const metadata = {
-          title: '',
-          description: '',
           date: '',
           shutter_speed: '',
           iso: '',
@@ -163,14 +237,14 @@ const AdminPanel = ({ onLogout }) => {
 
     const formData = new FormData();
     formData.append('image', uploadForm.image);
-    formData.append('title', uploadForm.title);
-    formData.append('description', uploadForm.description);
     formData.append('date', uploadForm.date);
     formData.append('shutter_speed', uploadForm.shutter_speed);
     formData.append('iso', uploadForm.iso);
     formData.append('focal_length', uploadForm.focal_length);
     formData.append('aperture', uploadForm.aperture);
     formData.append('camera_info', uploadForm.camera_info);
+    formData.append('is_black_white', uploadForm.is_black_white);
+    formData.append('category_id', uploadForm.category_id);
 
     try {
       const response = await fetch('http://localhost:5000/api/photos', {
@@ -183,14 +257,14 @@ const AdminPanel = ({ onLogout }) => {
 
       if (response.ok) {
         setUploadForm({
-          title: '',
-          description: '',
           date: '',
           shutter_speed: '',
           iso: '',
           focal_length: '',
           aperture: '',
           camera_info: '',
+          is_black_white: false,
+          category_id: '',
           image: null
         });
         setShowUploadForm(false);
@@ -253,6 +327,78 @@ const AdminPanel = ({ onLogout }) => {
     }
   };
 
+  const handleAddCategory = async (e) => {
+    e.preventDefault();
+    if (!newCategoryName.trim()) {
+      setError('Category name is required');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/categories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name: newCategoryName.trim() })
+      });
+
+      if (response.ok) {
+        setNewCategoryName('');
+        setShowCategoryForm(false);
+        fetchCategories();
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to add category');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId) => {
+    if (!window.confirm('Are you sure you want to delete this category?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        fetchCategories();
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to delete category');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    }
+  };
+
+  const handleFilterChange = (field, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      search: '',
+      category: '',
+      photoType: '',
+      dateFrom: '',
+      dateTo: '',
+      camera: ''
+    });
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -290,6 +436,18 @@ const AdminPanel = ({ onLogout }) => {
         >
           {showUploadForm ? 'Cancel Upload' : 'Upload New Photo'}
         </button>
+        <button 
+          onClick={() => setShowCategoryForm(!showCategoryForm)}
+          className="category-btn"
+        >
+          {showCategoryForm ? 'Cancel' : 'Manage Categories'}
+        </button>
+        <button 
+          onClick={() => setShowFilters(!showFilters)}
+          className="filter-btn"
+        >
+          {showFilters ? 'Hide Filters' : 'Show Filters'}
+        </button>
       </div>
 
       {showUploadForm && (
@@ -321,25 +479,7 @@ const AdminPanel = ({ onLogout }) => {
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Title</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={uploadForm.title}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  name="description"
-                  value={uploadForm.description}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
+
 
             <div className="form-row">
               <div className="form-group">
@@ -409,6 +549,38 @@ const AdminPanel = ({ onLogout }) => {
               </div>
             </div>
 
+            <div className="form-row">
+              <div className="form-group">
+                <label>Photo Type</label>
+                <select
+                  name="is_black_white"
+                  value={uploadForm.is_black_white}
+                  onChange={(e) => setUploadForm({
+                    ...uploadForm,
+                    is_black_white: e.target.value === 'true'
+                  })}
+                >
+                  <option value={false}>Color</option>
+                  <option value={true}>Black & White</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Category</label>
+                <select
+                  name="category_id"
+                  value={uploadForm.category_id}
+                  onChange={handleInputChange}
+                >
+                  <option value="">Select Category</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <button type="submit" disabled={uploading}>
               {uploading ? 'Uploading...' : 'Upload Photo'}
             </button>
@@ -416,17 +588,136 @@ const AdminPanel = ({ onLogout }) => {
         </div>
       )}
 
+      {showCategoryForm && (
+        <div className="category-form">
+          <h3>Manage Categories</h3>
+          <form onSubmit={handleAddCategory}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>New Category Name</label>
+                <input
+                  type="text"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="Enter category name"
+                />
+              </div>
+              <div className="form-group">
+                <button type="submit" className="add-category-btn">
+                  Add Category
+                </button>
+              </div>
+            </div>
+          </form>
+          
+          <div className="categories-list">
+            <h4>Existing Categories</h4>
+            {categories.map(category => (
+              <div key={category.id} className="category-item">
+                <span>{category.name}</span>
+                <button 
+                  onClick={() => handleDeleteCategory(category.id)}
+                  className="delete-category-btn"
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showFilters && (
+        <div className="filter-form">
+          <h3>Filter Photos</h3>
+          <div className="filter-grid">
+            <div className="filter-group">
+              <label>Search</label>
+              <input
+                type="text"
+                placeholder="Search by filename, camera, or category..."
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+              />
+            </div>
+            
+            <div className="filter-group">
+              <label>Category</label>
+              <select
+                value={filters.category}
+                onChange={(e) => handleFilterChange('category', e.target.value)}
+              >
+                <option value="">All Categories</option>
+                {categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="filter-group">
+              <label>Photo Type</label>
+              <select
+                value={filters.photoType}
+                onChange={(e) => handleFilterChange('photoType', e.target.value)}
+              >
+                <option value="">All Types</option>
+                <option value="color">Color</option>
+                <option value="black_white">Black & White</option>
+              </select>
+            </div>
+            
+            <div className="filter-group">
+              <label>Camera</label>
+              <input
+                type="text"
+                placeholder="Filter by camera model..."
+                value={filters.camera}
+                onChange={(e) => handleFilterChange('camera', e.target.value)}
+              />
+            </div>
+            
+            <div className="filter-group">
+              <label>Date From</label>
+              <input
+                type="date"
+                value={filters.dateFrom}
+                onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+              />
+            </div>
+            
+            <div className="filter-group">
+              <label>Date To</label>
+              <input
+                type="date"
+                value={filters.dateTo}
+                onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+              />
+            </div>
+          </div>
+          
+          <div className="filter-actions">
+            <button onClick={clearFilters} className="clear-filters-btn">
+              Clear All Filters
+            </button>
+            <span className="filter-results">
+              Showing {filteredPhotos.length} of {photos.length} photos
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="photos-grid">
-        <h3>Manage Photos ({photos.length})</h3>
-        {photos.map(photo => (
+        <h3>Manage Photos ({filteredPhotos.length} of {photos.length})</h3>
+        {filteredPhotos.map(photo => (
           <div key={photo.id} className="photo-item">
             <img 
               src={`http://localhost:5000/uploads/${photo.filename}`} 
               alt={photo.title || 'Photo'}
             />
             <div className="photo-info">
-              <h4>{photo.title || 'Untitled'}</h4>
-              <p>{photo.description}</p>
+              <h4>Photo #{photo.id}</h4>
               <div className="photo-metadata">
                 {photo.date && <span>Date: {photo.date}</span>}
                 {photo.shutter_speed && <span>Shutter: {photo.shutter_speed}</span>}
@@ -434,6 +725,8 @@ const AdminPanel = ({ onLogout }) => {
                 {photo.focal_length && <span>Focal: {photo.focal_length}</span>}
                 {photo.aperture && <span>Aperture: {photo.aperture}</span>}
                 {photo.camera_info && <span>Camera: {photo.camera_info}</span>}
+                <span>Type: {photo.is_black_white ? 'Black & White' : 'Color'}</span>
+                {photo.category_name && <span>Category: {photo.category_name}</span>}
               </div>
               <div className="photo-actions">
                 <button 
@@ -459,29 +752,7 @@ const AdminPanel = ({ onLogout }) => {
           <div className="edit-modal-content">
             <h3>Edit Photo</h3>
             <form onSubmit={handleEdit}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Title</label>
-                  <input
-                    type="text"
-                    value={editingPhoto.title || ''}
-                    onChange={(e) => setEditingPhoto({
-                      ...editingPhoto,
-                      title: e.target.value
-                    })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Description</label>
-                  <textarea
-                    value={editingPhoto.description || ''}
-                    onChange={(e) => setEditingPhoto({
-                      ...editingPhoto,
-                      description: e.target.value
-                    })}
-                  />
-                </div>
-              </div>
+
 
               <div className="form-row">
                 <div className="form-group">
@@ -555,6 +826,39 @@ const AdminPanel = ({ onLogout }) => {
                       camera_info: e.target.value
                     })}
                   />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Photo Type</label>
+                  <select
+                    value={editingPhoto.is_black_white || false}
+                    onChange={(e) => setEditingPhoto({
+                      ...editingPhoto,
+                      is_black_white: e.target.value === 'true'
+                    })}
+                  >
+                    <option value={false}>Color</option>
+                    <option value={true}>Black & White</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Category</label>
+                  <select
+                    value={editingPhoto.category_id || ''}
+                    onChange={(e) => setEditingPhoto({
+                      ...editingPhoto,
+                      category_id: e.target.value || null
+                    })}
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

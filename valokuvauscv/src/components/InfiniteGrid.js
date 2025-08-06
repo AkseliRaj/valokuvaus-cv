@@ -26,9 +26,7 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
           const transformedPhotos = data.map(photo => ({
             id: photo.id,
             src: `http://localhost:5000/uploads/${photo.filename}`,
-            alt: photo.title || 'Photo',
-            title: photo.title || 'Untitled',
-            description: photo.description || '',
+            alt: `Photo ${photo.id}`,
             // Add metadata for display
             metadata: {
               date: photo.date,
@@ -36,7 +34,9 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
               iso: photo.iso,
               focal_length: photo.focal_length,
               aperture: photo.aperture,
-              camera_info: photo.camera_info
+              camera_info: photo.camera_info,
+              is_black_white: photo.is_black_white,
+              category_name: photo.category_name
             }
           }));
           setPhotos(transformedPhotos);

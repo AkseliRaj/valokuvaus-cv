@@ -47,16 +47,29 @@ function createTables() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       filename TEXT NOT NULL,
       original_name TEXT NOT NULL,
-      title TEXT,
-      description TEXT,
       date TEXT,
       shutter_speed TEXT,
       iso TEXT,
       focal_length TEXT,
       aperture TEXT,
       camera_info TEXT,
+      is_black_white BOOLEAN DEFAULT 0,
+      category_id INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
+
+    // Categories table
+    db.run(`CREATE TABLE IF NOT EXISTS categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    // Insert default categories
+    const defaultCategories = ['Portrait', 'Nature', 'Animals', 'Documentary'];
+    defaultCategories.forEach(category => {
+      db.run('INSERT OR IGNORE INTO categories (name) VALUES (?)', [category]);
+    });
 
     // Create default admin user
     const defaultPassword = 'admin123';
@@ -167,13 +180,74 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-// Get all photos
+// Get all photos with category information
 app.get('/api/photos', (req, res) => {
-  db.all('SELECT * FROM photos ORDER BY created_at DESC', (err, photos) => {
+  db.all(`
+    SELECT p.*, c.name as category_name 
+    FROM photos p 
+    LEFT JOIN categories c ON p.category_id = c.id 
+    ORDER BY p.created_at DESC
+  `, (err, photos) => {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
     }
     res.json(photos);
+  });
+});
+
+// Get all categories
+app.get('/api/categories', (req, res) => {
+  db.all('SELECT * FROM categories ORDER BY name', (err, categories) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(categories);
+  });
+});
+
+// Add new category (admin only)
+app.post('/api/categories', authenticateToken, (req, res) => {
+  const { name } = req.body;
+
+  if (!name || name.trim() === '') {
+    return res.status(400).json({ error: 'Category name is required' });
+  }
+
+  db.run('INSERT INTO categories (name) VALUES (?)', [name.trim()], function(err) {
+    if (err) {
+      if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        return res.status(400).json({ error: 'Category already exists' });
+      }
+      return res.status(500).json({ error: 'Database error' });
+    }
+    
+    res.json({
+      id: this.lastID,
+      name: name.trim()
+    });
+  });
+});
+
+// Delete category (admin only)
+app.delete('/api/categories/:id', authenticateToken, (req, res) => {
+  const { id } = req.params;
+
+  // Check if category is being used by any photos
+  db.get('SELECT COUNT(*) as count FROM photos WHERE category_id = ?', [id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    if (result.count > 0) {
+      return res.status(400).json({ error: 'Cannot delete category that is being used by photos' });
+    }
+
+    db.run('DELETE FROM categories WHERE id = ?', [id], (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      res.json({ message: 'Category deleted successfully' });
+    });
   });
 });
 
@@ -184,23 +258,23 @@ app.post('/api/photos', authenticateToken, upload.single('image'), (req, res) =>
   }
 
   const {
-    title,
-    description,
     date,
     shutter_speed,
     iso,
     focal_length,
     aperture,
-    camera_info
+    camera_info,
+    is_black_white,
+    category_id
   } = req.body;
 
   const filename = req.file.filename;
   const originalName = req.file.originalname;
 
   db.run(
-    `INSERT INTO photos (filename, original_name, title, description, date, shutter_speed, iso, focal_length, aperture, camera_info)
+    `INSERT INTO photos (filename, original_name, date, shutter_speed, iso, focal_length, aperture, camera_info, is_black_white, category_id)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [filename, originalName, title, description, date, shutter_speed, iso, focal_length, aperture, camera_info],
+    [filename, originalName, date, shutter_speed, iso, focal_length, aperture, camera_info, is_black_white || 0, category_id || null],
     function(err) {
       if (err) {
         return res.status(500).json({ error: 'Database error' });
@@ -210,14 +284,14 @@ app.post('/api/photos', authenticateToken, upload.single('image'), (req, res) =>
         id: this.lastID,
         filename,
         original_name: originalName,
-        title,
-        description,
         date,
         shutter_speed,
         iso,
         focal_length,
         aperture,
-        camera_info
+        camera_info,
+        is_black_white: is_black_white || 0,
+        category_id: category_id || null
       });
     }
   );
@@ -256,20 +330,20 @@ app.delete('/api/photos/:id', authenticateToken, (req, res) => {
 app.put('/api/photos/:id', authenticateToken, (req, res) => {
   const { id } = req.params;
   const {
-    title,
-    description,
     date,
     shutter_speed,
     iso,
     focal_length,
     aperture,
-    camera_info
+    camera_info,
+    is_black_white,
+    category_id
   } = req.body;
 
   db.run(
-    `UPDATE photos SET title = ?, description = ?, date = ?, shutter_speed = ?, iso = ?, focal_length = ?, aperture = ?, camera_info = ?
+    `UPDATE photos SET date = ?, shutter_speed = ?, iso = ?, focal_length = ?, aperture = ?, camera_info = ?, is_black_white = ?, category_id = ?
      WHERE id = ?`,
-    [title, description, date, shutter_speed, iso, focal_length, aperture, camera_info, id],
+    [date, shutter_speed, iso, focal_length, aperture, camera_info, is_black_white || 0, category_id || null, id],
     function(err) {
       if (err) {
         return res.status(500).json({ error: 'Database error' });

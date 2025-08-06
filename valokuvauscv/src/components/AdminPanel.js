@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import exifr from 'exifr';
 import './AdminPanel.css';
 
 const AdminPanel = ({ onLogout }) => {
@@ -22,6 +23,7 @@ const AdminPanel = ({ onLogout }) => {
     camera_info: '',
     image: null
   });
+  const [metadataExtracted, setMetadataExtracted] = useState(false);
 
   const token = localStorage.getItem('token');
 
@@ -41,11 +43,92 @@ const AdminPanel = ({ onLogout }) => {
     }
   };
 
-  const handleFileChange = (e) => {
-    setUploadForm({
-      ...uploadForm,
-      image: e.target.files[0]
-    });
+  const extractMetadata = async (file) => {
+    try {
+      const exifData = await exifr.parse(file);
+      
+      if (exifData) {
+        const metadata = {
+          title: '',
+          description: '',
+          date: '',
+          shutter_speed: '',
+          iso: '',
+          focal_length: '',
+          aperture: '',
+          camera_info: ''
+        };
+
+        // Extract date
+        if (exifData.DateTimeOriginal) {
+          const date = new Date(exifData.DateTimeOriginal);
+          metadata.date = date.toISOString().split('T')[0];
+        } else if (exifData.DateTime) {
+          const date = new Date(exifData.DateTime);
+          metadata.date = date.toISOString().split('T')[0];
+        }
+
+        // Extract shutter speed
+        if (exifData.ExposureTime) {
+          metadata.shutter_speed = `1/${Math.round(1/exifData.ExposureTime)}`;
+        }
+
+        // Extract ISO
+        if (exifData.ISO) {
+          metadata.iso = exifData.ISO.toString();
+        }
+
+        // Extract focal length
+        if (exifData.FocalLength) {
+          metadata.focal_length = `${Math.round(exifData.FocalLength)}mm`;
+        }
+
+        // Extract aperture
+        if (exifData.FNumber) {
+          metadata.aperture = `f/${exifData.FNumber}`;
+        }
+
+        // Extract camera info
+        const cameraParts = [];
+        if (exifData.Make) cameraParts.push(exifData.Make);
+        if (exifData.Model) cameraParts.push(exifData.Model);
+        if (cameraParts.length > 0) {
+          metadata.camera_info = cameraParts.join(' ');
+        }
+
+        return metadata;
+      }
+    } catch (error) {
+      console.log('No EXIF data found or error reading metadata:', error);
+    }
+    
+    return null;
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    
+    if (file) {
+      // Extract metadata from the image
+      const metadata = await extractMetadata(file);
+      
+      // Update form with extracted metadata, preserving any existing user input
+      setUploadForm(prevForm => ({
+        ...prevForm,
+        image: file,
+        ...(metadata && {
+          date: metadata.date || prevForm.date,
+          shutter_speed: metadata.shutter_speed || prevForm.shutter_speed,
+          iso: metadata.iso || prevForm.iso,
+          focal_length: metadata.focal_length || prevForm.focal_length,
+          aperture: metadata.aperture || prevForm.aperture,
+          camera_info: metadata.camera_info || prevForm.camera_info
+        })
+      }));
+      
+      // Set flag to show metadata was extracted
+      setMetadataExtracted(!!metadata);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -53,6 +136,19 @@ const AdminPanel = ({ onLogout }) => {
       ...uploadForm,
       [e.target.name]: e.target.value
     });
+  };
+
+  const clearMetadata = () => {
+    setUploadForm(prevForm => ({
+      ...prevForm,
+      date: '',
+      shutter_speed: '',
+      iso: '',
+      focal_length: '',
+      aperture: '',
+      camera_info: ''
+    }));
+    setMetadataExtracted(false);
   };
 
   const handleUpload = async (e) => {
@@ -199,6 +295,18 @@ const AdminPanel = ({ onLogout }) => {
       {showUploadForm && (
         <div className="upload-form">
           <h3>Upload New Photo</h3>
+          {metadataExtracted && (
+            <div className="metadata-notification">
+              <span>✅ Metadata automatically extracted from image</span>
+              <button 
+                type="button" 
+                onClick={clearMetadata}
+                className="clear-metadata-btn"
+              >
+                Clear Metadata
+              </button>
+            </div>
+          )}
           <form onSubmit={handleUpload}>
             <div className="form-row">
               <div className="form-group">
@@ -209,6 +317,7 @@ const AdminPanel = ({ onLogout }) => {
                   onChange={handleFileChange}
                   required
                 />
+                <small>Select an image to automatically extract camera metadata (EXIF data)</small>
               </div>
             </div>
 

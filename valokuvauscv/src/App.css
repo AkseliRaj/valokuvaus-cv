@@ -16,6 +16,36 @@ body {
   overflow: hidden;
 }
 
+/* Allow scrolling for admin pages */
+body.admin-page-active {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Override App styles for admin pages */
+body.admin-page-active .App {
+  overflow: hidden;
+  height: 100vh;
+  position: relative;
+}
+
+/* Ensure admin page content can scroll */
+body.admin-page-active .admin-page {
+  overflow-y: auto;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+body.admin-page-active .admin-panel {
+  overflow: visible;
+  height: auto;
+}
+
 .App {
   width: 100vw;
   height: 100vh;
@@ -25,6 +55,12 @@ body {
   user-select: none;
   touch-action: none;
   cursor: grab;
+}
+
+/* Override touch-action for admin pages */
+body.admin-page-active .App {
+  touch-action: auto;
+  cursor: auto;
 }
 
 .App:active {
@@ -37,6 +73,14 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+/* Allow text selection and scrolling on admin pages */
+body.admin-page-active .App * {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
 }
 
 /* Login button container */

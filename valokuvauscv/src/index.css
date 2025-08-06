@@ -12,6 +12,12 @@ body {
   height: 100vh;
 }
 
+/* Allow scrolling for admin pages */
+body.admin-page-active {
+  overflow: hidden;
+  height: 100vh;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -22,6 +28,19 @@ html, body, #root {
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+/* Allow scrolling for admin pages */
+body.admin-page-active,
+body.admin-page-active #root {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Ensure all admin page elements can scroll */
+body.admin-page-active html {
+  overflow: hidden;
+  height: 100vh;
 }
 
 /* Remove default margins and padding */

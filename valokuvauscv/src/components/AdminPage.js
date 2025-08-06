@@ -18,6 +18,14 @@ const AdminPage = () => {
     }
   }, []);
 
+  // Add/remove body class for admin page scrolling
+  useEffect(() => {
+    document.body.classList.add('admin-page-active');
+    return () => {
+      document.body.classList.remove('admin-page-active');
+    };
+  }, []);
+
   const handleLogin = (data) => {
     setIsAuthenticated(true);
     setUser(data.user);

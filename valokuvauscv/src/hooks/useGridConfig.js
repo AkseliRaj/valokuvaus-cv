@@ -15,11 +15,11 @@ export const useGridConfig = () => {
       let newConfig;
       
       if (width <= 480) {
-        newConfig = { columns: 3, photoWidth: 250, photoHeight: 375, gap: 10 };
+        newConfig = { columns: 3, photoWidth: 180, photoHeight: 270, gap: 40 };
       } else if (width <= 768) {
-        newConfig = { columns: 5, photoWidth: 300, photoHeight: 450, gap: 15 };
+        newConfig = { columns: 5, photoWidth: 220, photoHeight: 330, gap: 60 };
       } else {
-        newConfig = { columns: 7, photoWidth: 400, photoHeight: 600, gap: 20 };
+        newConfig = { columns: 7, photoWidth: 280, photoHeight: 420, gap: 80 };
       }
       
       setGridConfig(newConfig);

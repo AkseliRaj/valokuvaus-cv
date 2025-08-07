@@ -13,8 +13,9 @@
 
 .metadata-notification {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
+  gap: 10px;
   background: rgba(40, 167, 69, 0.2);
   border: 1px solid rgba(40, 167, 69, 0.3);
   padding: 12px 16px;
@@ -28,6 +29,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .clear-metadata-btn {
@@ -76,6 +85,28 @@
   transition: border-color 0.3s ease;
 }
 
+.remove-image-btn {
+  background: rgba(220, 53, 69, 0.25);
+  color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}
+
+.remove-image-btn:hover {
+  background: rgba(220, 53, 69, 0.35);
+  color: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
@@ -87,6 +118,27 @@
   color: rgba(255, 255, 255, 0.7);
   font-size: 12px;
   font-style: italic;
+}
+
+.image-preview {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.image-preview img {
+  max-width: 200px;
+  max-height: 150px;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.image-preview img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .error-message {

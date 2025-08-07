@@ -5,7 +5,7 @@ import './AdminPanel.css';
 // Import the new smaller components
 import AdminHeader from './AdminHeader';
 import AdminActions from './AdminActions';
-import UploadForm from './UploadForm';
+import UploadModal from './UploadModal';
 import CategoryManager from './CategoryManager';
 import PhotoGrid from './PhotoGrid';
 import EditPhotoModal from './EditPhotoModal';
@@ -18,7 +18,7 @@ const AdminPanel = ({ onLogout }) => {
   const [error, setError] = useState('');
   
   // UI state
-  const [showUploadForm, setShowUploadForm] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [editingPhoto, setEditingPhoto] = useState(null);
@@ -140,6 +140,7 @@ const AdminPanel = ({ onLogout }) => {
     }
 
     fetchPhotos();
+    setShowUploadModal(false); // Close modal after successful upload
   };
 
   // Delete handlers
@@ -255,7 +256,8 @@ const AdminPanel = ({ onLogout }) => {
   };
 
   // UI toggle handlers
-  const toggleUploadForm = () => setShowUploadForm(!showUploadForm);
+  const openUploadModal = () => setShowUploadModal(true);
+  const closeUploadModal = () => setShowUploadModal(false);
   const toggleCategoryForm = () => setShowCategoryForm(!showCategoryForm);
   const toggleFilters = () => setShowFilters(!showFilters);
 
@@ -273,19 +275,18 @@ const AdminPanel = ({ onLogout }) => {
       {error && <div className="error-message">{error}</div>}
 
       <AdminActions 
-        showUploadForm={showUploadForm}
+        showUploadForm={showUploadModal}
         showCategoryForm={showCategoryForm}
-        onToggleUpload={toggleUploadForm}
+        onToggleUpload={openUploadModal}
         onToggleCategories={toggleCategoryForm}
       />
 
-      {showUploadForm && (
-        <UploadForm 
-          categories={categories}
-          onUpload={handleUpload}
-          onCancel={toggleUploadForm}
-        />
-      )}
+      <UploadModal 
+        isOpen={showUploadModal}
+        onClose={closeUploadModal}
+        categories={categories}
+        onUpload={handleUpload}
+      />
 
       {showCategoryForm && (
         <CategoryManager 

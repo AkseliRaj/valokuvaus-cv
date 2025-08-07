@@ -13,7 +13,7 @@ const AdminActions = ({
         onClick={onToggleUpload}
         className="upload-btn"
       >
-        {showUploadForm ? 'Cancel Upload' : 'Upload New Photo'}
+        Upload New Photo
       </button>
       <button 
         onClick={onToggleCategories}

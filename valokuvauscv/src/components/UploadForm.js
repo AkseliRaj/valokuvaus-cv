@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import exifr from 'exifr';
 import './UploadForm.css';
 
-const UploadForm = ({ categories, onUpload, onCancel }) => {
+const UploadForm = ({ categories, onUpload, onCancel, onUnsavedChanges }) => {
   const [uploadForm, setUploadForm] = useState({
     date: '',
     shutter_speed: '',
@@ -17,6 +17,15 @@ const UploadForm = ({ categories, onUpload, onCancel }) => {
   const [metadataExtracted, setMetadataExtracted] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Notify parent about unsaved changes
+  useEffect(() => {
+    if (onUnsavedChanges) {
+      onUnsavedChanges(hasUnsavedChanges);
+    }
+  }, [hasUnsavedChanges, onUnsavedChanges]);
 
   const extractMetadata = async (file) => {
     try {
@@ -82,6 +91,10 @@ const UploadForm = ({ categories, onUpload, onCancel }) => {
     const file = e.target.files[0];
     
     if (file) {
+      // Create preview URL for thumbnail
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      
       // Extract metadata from the image
       const metadata = await extractMetadata(file);
       
@@ -101,6 +114,7 @@ const UploadForm = ({ categories, onUpload, onCancel }) => {
       
       // Set flag to show metadata was extracted
       setMetadataExtracted(!!metadata);
+      setHasUnsavedChanges(true);
     }
   };
 
@@ -109,6 +123,7 @@ const UploadForm = ({ categories, onUpload, onCancel }) => {
       ...uploadForm,
       [e.target.name]: e.target.value
     });
+    setHasUnsavedChanges(true);
   };
 
   const clearMetadata = () => {
@@ -121,7 +136,28 @@ const UploadForm = ({ categories, onUpload, onCancel }) => {
       aperture: '',
       camera_info: ''
     }));
+    // Don't reset metadataExtracted flag so buttons remain visible
+    setHasUnsavedChanges(true);
+  };
+
+  const clearImageAndForm = () => {
+    // Clear the image and preview
+    setUploadForm(prevForm => ({
+      ...prevForm,
+      image: null,
+      date: '',
+      shutter_speed: '',
+      iso: '',
+      focal_length: '',
+      aperture: '',
+      camera_info: '',
+      is_black_white: false,
+      category_id: ''
+    }));
     setMetadataExtracted(false);
+    setPreviewUrl(null);
+    setError('');
+    setHasUnsavedChanges(false);
   };
 
   const handleSubmit = async (e) => {
@@ -150,7 +186,11 @@ const UploadForm = ({ categories, onUpload, onCancel }) => {
         image: null
       });
       setMetadataExtracted(false);
-      onCancel();
+      setPreviewUrl(null);
+      setHasUnsavedChanges(false);
+      if (onCancel) {
+        onCancel();
+      }
     } catch (err) {
       setError(err.message || 'Upload failed');
     } finally {
@@ -158,21 +198,18 @@ const UploadForm = ({ categories, onUpload, onCancel }) => {
     }
   };
 
+  // Cleanup preview URL when component unmounts
+  React.useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   return (
     <div className="upload-form">
       <h3>Upload New Photo</h3>
-      {metadataExtracted && (
-        <div className="metadata-notification">
-          <span>✅ Metadata automatically extracted from image</span>
-          <button 
-            type="button" 
-            onClick={clearMetadata}
-            className="clear-metadata-btn"
-          >
-            Clear Metadata
-          </button>
-        </div>
-      )}
       <form onSubmit={handleSubmit}>
         <div className="form-row">
           <div className="form-group">
@@ -183,7 +220,33 @@ const UploadForm = ({ categories, onUpload, onCancel }) => {
               onChange={handleFileChange}
               required
             />
+            {uploadForm.image && (
+              <small>Selected: {uploadForm.image.name}</small>
+            )}
             <small>Select an image to automatically extract camera metadata (EXIF data)</small>
+            {previewUrl && (
+              <div className="image-preview">
+                <img src={previewUrl} alt="Preview" />
+              </div>
+            )}
+            {metadataExtracted && (
+              <div className="action-buttons">
+                <button 
+                  type="button" 
+                  onClick={clearMetadata}
+                  className="clear-metadata-btn"
+                >
+                  Clear Metadata
+                </button>
+                <button
+                  type="button"
+                  onClick={clearImageAndForm}
+                  className="remove-image-btn"
+                >
+                  Remove Image
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -292,9 +355,6 @@ const UploadForm = ({ categories, onUpload, onCancel }) => {
         <div className="form-actions">
           <button type="submit" disabled={uploading}>
             {uploading ? 'Uploading...' : 'Upload Photo'}
-          </button>
-          <button type="button" onClick={onCancel} className="cancel-btn">
-            Cancel
           </button>
         </div>
       </form>

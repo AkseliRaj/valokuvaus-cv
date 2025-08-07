@@ -4,7 +4,7 @@ import ImageModal from './ImageModal';
 import { basePhotos } from '../data/photoData';
 import './InfiniteGrid.css';
 
-const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallback, dragDistance }) => {
+const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallback, dragDistance, onModalStateChange }) => {
   const gridRef = useRef(null);
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
   const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 });
@@ -187,6 +187,13 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     setIsModalOpen(false);
     setModalPhoto(null);
   }, []);
+
+  // Notify parent component when modal state changes
+  useEffect(() => {
+    if (onModalStateChange) {
+      onModalStateChange(isModalOpen);
+    }
+  }, [isModalOpen, onModalStateChange]);
 
   // Function to refresh randomization (can be called from parent if needed)
   const refreshRandomization = useCallback(() => {

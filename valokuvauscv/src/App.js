@@ -11,6 +11,7 @@ import './App.css';
 const Gallery = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const containerRef = useRef(null);
@@ -51,20 +52,24 @@ const Gallery = () => {
     const container = containerRef.current;
     if (container) {
       const wheelHandler = (e) => {
+        if (isModalOpen) return; // Disable wheel when modal is open
         e.preventDefault();
         handleWheel(e);
       };
       
       const touchStartHandler = (e) => {
+        if (isModalOpen) return; // Disable touch when modal is open
         handleTouchStart(e);
       };
       
       const touchMoveHandler = (e) => {
+        if (isModalOpen) return; // Disable touch when modal is open
         e.preventDefault();
         handleTouchMove(e);
       };
       
       const touchEndHandler = (e) => {
+        if (isModalOpen) return; // Disable touch when modal is open
         handleTouchEnd(e);
       };
       
@@ -113,11 +118,11 @@ const Gallery = () => {
     <div 
       className="App"
       ref={containerRef}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+      onMouseDown={isModalOpen ? undefined : handleMouseDown}
+      onMouseMove={isModalOpen ? undefined : handleMouseMove}
+      onMouseUp={isModalOpen ? undefined : handleMouseUp}
+      onMouseLeave={isModalOpen ? undefined : handleMouseUp}
+      style={{ cursor: isModalOpen ? 'default' : (isDragging ? 'grabbing' : 'grab') }}
     >
       {/* Admin button for authenticated users */}
       {isAuthenticated && (
@@ -145,6 +150,7 @@ const Gallery = () => {
         getScrollPosition={getScrollPosition}
         setUpdateCallback={setUpdateCallback}
         dragDistance={dragDistance}
+        onModalStateChange={setIsModalOpen}
       />
       <InstructionsOverlay />
 

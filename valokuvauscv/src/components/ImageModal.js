@@ -47,8 +47,6 @@ const ImageModal = ({ isOpen, photo, onClose }) => {
           />
         </div>
         <div className="image-modal-info">
-          <h2>Photo #{photo.id}</h2>
-          
           {hasMetadata && (
             <div className="image-modal-metadata">
               <h3>Photo Details</h3>

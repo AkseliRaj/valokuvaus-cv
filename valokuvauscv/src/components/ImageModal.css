@@ -24,7 +24,9 @@
   transform: scale(0.8);
   animation: scaleIn 0.3s ease-out forwards;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  height: 95vh;
+  padding: 20px;
 }
 
 .image-modal-close {
@@ -58,14 +60,13 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
-  flex: 1;
+  flex: 2;
+  min-height: 0;
 }
 
 .image-modal-image {
-  width: auto;
-  height: auto;
-  max-width: 90vw;
-  max-height: 80vh;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
   opacity: 0;
@@ -76,6 +77,9 @@
   padding: 20px;
   background: #242424;
   flex-shrink: 0;
+  flex: 1;
+  min-width: 300px;
+  max-width: 400px;
 }
 
 .image-modal-info h2 {
@@ -194,15 +198,23 @@
   .image-modal-content {
     max-width: 95vw;
     max-height: 95vh;
+    flex-direction: column;
   }
   
   .image-modal-image {
-    max-width: 85vw;
-    max-height: 75vh;
+    width: 100%;
+    height: 100%;
   }
   
   .image-modal-image-container {
     padding: 15px;
+    flex: 1;
+  }
+  
+  .image-modal-info {
+    flex: none;
+    min-width: auto;
+    max-width: none;
   }
   
   .image-modal-info {
@@ -241,15 +253,23 @@
     max-width: 100vw;
     max-height: 100vh;
     border-radius: 0;
+    flex-direction: column;
   }
   
   .image-modal-image {
-    max-width: 90vw;
-    max-height: 70vh;
+    width: 100%;
+    height: 100%;
   }
   
   .image-modal-image-container {
     padding: 10px;
+    flex: 1;
+  }
+  
+  .image-modal-info {
+    flex: none;
+    min-width: auto;
+    max-width: none;
   }
   
   .image-modal-info {

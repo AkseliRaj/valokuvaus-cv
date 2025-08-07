@@ -54,9 +54,6 @@ const PhotoCard = React.memo(({ photo, style, onPhotoClick, dragDistance }) => {
             onLoad={handleImageLoad}
           />
         )}
-        <div className="photo-overlay">
-          <h3>Photo #{photo.id}</h3>
-        </div>
       </div>
     </div>
   );

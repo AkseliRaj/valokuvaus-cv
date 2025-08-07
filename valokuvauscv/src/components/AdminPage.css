@@ -12,14 +12,15 @@
   bottom: 0;
   overflow-y: auto;
   z-index: 1000;
-  --dot-bg: #242424;
-  --dot-color: rgba(255, 255, 255, 0.3);
-  --dot-size: 2px;
-  --dot-space: 20px;
+  --square-bg: #242424;
+  --square-color: rgba(91, 91, 91, 0.3);
+  --square-size: 0.5px;
+  --square-space: 45px;
   background:
-    linear-gradient(90deg, var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center / var(--dot-space) var(--dot-space),
-    linear-gradient(var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center / var(--dot-space) var(--dot-space),
-    var(--dot-color);
+    linear-gradient(90deg, var(--square-color) 1px, transparent 1px) center / var(--square-space) var(--square-space),
+    linear-gradient(var(--square-color) 1px, transparent 1px) center / var(--square-space) var(--square-space),
+    var(--square-bg);
+  background-attachment: local;
 }
 
 .admin-page .login-container {

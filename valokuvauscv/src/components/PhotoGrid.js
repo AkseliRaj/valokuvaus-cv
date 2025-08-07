@@ -14,6 +14,8 @@ const PhotoGrid = ({
   totalCount
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [photoToDelete, setPhotoToDelete] = useState(null);
   const photosPerPage = 15;
 
   // Calculate pagination
@@ -29,6 +31,24 @@ const PhotoGrid = ({
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const handleDeleteClick = (photo) => {
+    setPhotoToDelete(photo);
+    setShowDeleteConfirmation(true);
+  };
+
+  const confirmDelete = () => {
+    if (photoToDelete) {
+      onDelete(photoToDelete.id);
+      setShowDeleteConfirmation(false);
+      setPhotoToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirmation(false);
+    setPhotoToDelete(null);
   };
 
   const renderPagination = () => {
@@ -250,7 +270,7 @@ const PhotoGrid = ({
                   Edit
                 </button>
                 <button 
-                  onClick={() => onDelete(photo.id)}
+                  onClick={() => handleDeleteClick(photo)}
                   className="delete-btn"
                 >
                   Delete
@@ -268,6 +288,24 @@ const PhotoGrid = ({
           </div>
           <div className="pagination-controls">
             {renderPagination()}
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {showDeleteConfirmation && (
+        <div className="confirmation-overlay">
+          <div className="confirmation-modal">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this photo? This action cannot be undone.</p>
+            <div className="confirmation-actions">
+              <button onClick={cancelDelete} className="cancel-btn">
+                Cancel
+              </button>
+              <button onClick={confirmDelete} className="confirm-btn">
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

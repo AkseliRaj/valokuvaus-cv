@@ -145,10 +145,6 @@ const AdminPanel = ({ onLogout }) => {
 
   // Delete handlers
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this photo?')) {
-      return;
-    }
-
     try {
       const response = await fetch(`http://localhost:5000/api/photos/${id}`, {
         method: 'DELETE',

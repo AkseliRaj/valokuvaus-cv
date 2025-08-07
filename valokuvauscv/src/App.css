@@ -55,6 +55,15 @@ body.admin-page-active .admin-panel {
   user-select: none;
   touch-action: none;
   cursor: grab;
+  --square-bg: #242424;
+  --square-color: rgba(91, 91, 91, 0.3);
+  --square-size: 0.5px;
+  --square-space: 45px;
+  background:
+    linear-gradient(90deg, var(--square-color) 1px, transparent 1px) center / var(--square-space) var(--square-space),
+    linear-gradient(var(--square-color) 1px, transparent 1px) center / var(--square-space) var(--square-space),
+    var(--square-bg);
+  background-attachment: local;
 }
 
 /* Override touch-action for admin pages */

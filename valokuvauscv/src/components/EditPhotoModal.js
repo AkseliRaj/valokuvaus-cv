@@ -1,17 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './EditPhotoModal.css';
 
 const EditPhotoModal = ({ photo, categories, onSave, onCancel }) => {
+  const [formData, setFormData] = useState(photo);
+
+  // Update form data when photo prop changes
+  useEffect(() => {
+    setFormData(photo);
+  }, [photo]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(photo);
+    onSave(formData);
   };
 
   const handleInputChange = (field, value) => {
-    onSave({
-      ...photo,
+    setFormData(prev => ({
+      ...prev,
       [field]: value
-    });
+    }));
   };
 
   if (!photo) return null;
@@ -26,7 +33,7 @@ const EditPhotoModal = ({ photo, categories, onSave, onCancel }) => {
               <label>Date</label>
               <input
                 type="date"
-                value={photo.date || ''}
+                value={formData.date || ''}
                 onChange={(e) => handleInputChange('date', e.target.value)}
               />
             </div>
@@ -34,7 +41,7 @@ const EditPhotoModal = ({ photo, categories, onSave, onCancel }) => {
               <label>Shutter Speed</label>
               <input
                 type="text"
-                value={photo.shutter_speed || ''}
+                value={formData.shutter_speed || ''}
                 onChange={(e) => handleInputChange('shutter_speed', e.target.value)}
               />
             </div>
@@ -45,7 +52,7 @@ const EditPhotoModal = ({ photo, categories, onSave, onCancel }) => {
               <label>ISO</label>
               <input
                 type="text"
-                value={photo.iso || ''}
+                value={formData.iso || ''}
                 onChange={(e) => handleInputChange('iso', e.target.value)}
               />
             </div>
@@ -53,7 +60,7 @@ const EditPhotoModal = ({ photo, categories, onSave, onCancel }) => {
               <label>Focal Length</label>
               <input
                 type="text"
-                value={photo.focal_length || ''}
+                value={formData.focal_length || ''}
                 onChange={(e) => handleInputChange('focal_length', e.target.value)}
               />
             </div>
@@ -64,7 +71,7 @@ const EditPhotoModal = ({ photo, categories, onSave, onCancel }) => {
               <label>Aperture</label>
               <input
                 type="text"
-                value={photo.aperture || ''}
+                value={formData.aperture || ''}
                 onChange={(e) => handleInputChange('aperture', e.target.value)}
               />
             </div>
@@ -72,7 +79,7 @@ const EditPhotoModal = ({ photo, categories, onSave, onCancel }) => {
               <label>Camera Info</label>
               <input
                 type="text"
-                value={photo.camera_info || ''}
+                value={formData.camera_info || ''}
                 onChange={(e) => handleInputChange('camera_info', e.target.value)}
               />
             </div>
@@ -82,7 +89,7 @@ const EditPhotoModal = ({ photo, categories, onSave, onCancel }) => {
             <div className="form-group">
               <label>Photo Type</label>
               <select
-                value={photo.is_black_white || false}
+                value={formData.is_black_white || false}
                 onChange={(e) => handleInputChange('is_black_white', e.target.value === 'true')}
               >
                 <option value={false}>Color</option>
@@ -92,7 +99,7 @@ const EditPhotoModal = ({ photo, categories, onSave, onCancel }) => {
             <div className="form-group">
               <label>Category</label>
               <select
-                value={photo.category_id || ''}
+                value={formData.category_id || ''}
                 onChange={(e) => handleInputChange('category_id', e.target.value || null)}
               >
                 <option value="">Select Category</option>

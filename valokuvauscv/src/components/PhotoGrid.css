@@ -408,4 +408,81 @@
   .pagination-btn:not([data-type="nav"]) {
     padding: 6px 6px;
   }
+}
+
+/* Confirmation Modal Styles */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.confirmation-modal {
+  background: #4e4e4e;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  max-width: 400px;
+  width: 100%;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.confirmation-modal h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.confirmation-modal p {
+  margin: 0 0 24px 0;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.confirmation-actions button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.confirmation-actions .cancel-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.confirmation-actions .cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+}
+
+.confirmation-actions .confirm-btn {
+  background: rgba(220, 53, 69, 0.25);
+  color: rgba(255, 255, 255, 0.95);
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+.confirmation-actions .confirm-btn:hover {
+  background: rgba(220, 53, 69, 0.35);
+  color: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
 } 

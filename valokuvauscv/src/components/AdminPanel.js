@@ -245,10 +245,21 @@ const AdminPanel = ({ onLogout }) => {
   };
 
   // Navigation handlers
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
+
   const handleLogout = () => {
+    setShowLogoutConfirmation(true);
+  };
+
+  const confirmLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    setShowLogoutConfirmation(false);
     onLogout();
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirmation(false);
   };
 
   const goToGallery = () => {
@@ -316,6 +327,24 @@ const AdminPanel = ({ onLogout }) => {
           onSave={handleEdit}
           onCancel={() => setEditingPhoto(null)}
         />
+      )}
+
+      {/* Logout confirmation */}
+      {showLogoutConfirmation && (
+        <div className="confirmation-overlay">
+          <div className="confirmation-modal">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout? You will need to log in again to access the admin panel.</p>
+            <div className="confirmation-actions">
+              <button onClick={cancelLogout} className="cancel-btn">
+                Cancel
+              </button>
+              <button onClick={confirmLogout} className="confirm-btn">
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

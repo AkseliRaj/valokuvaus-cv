@@ -83,11 +83,22 @@ const Gallery = () => {
     }
   }, [handleWheel, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
+
   const handleLogout = () => {
+    setShowLogoutConfirmation(true);
+  };
+
+  const confirmLogout = () => {
     setIsAuthenticated(false);
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    setShowLogoutConfirmation(false);
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirmation(false);
   };
 
   const goToAdmin = () => {
@@ -136,6 +147,24 @@ const Gallery = () => {
         dragDistance={dragDistance}
       />
       <InstructionsOverlay />
+
+      {/* Logout confirmation */}
+      {showLogoutConfirmation && (
+        <div className="confirmation-overlay">
+          <div className="confirmation-modal">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout? You will need to log in again to access the admin panel.</p>
+            <div className="confirmation-actions">
+              <button onClick={cancelLogout} className="cancel-btn">
+                Cancel
+              </button>
+              <button onClick={confirmLogout} className="confirm-btn">
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

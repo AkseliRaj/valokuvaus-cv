@@ -288,14 +288,13 @@ const AdminPanel = ({ onLogout }) => {
         onUpload={handleUpload}
       />
 
-      {showCategoryForm && (
-        <CategoryManager 
-          categories={categories}
-          onAddCategory={handleAddCategory}
-          onDeleteCategory={handleDeleteCategory}
-          onCancel={toggleCategoryForm}
-        />
-      )}
+      <CategoryManager 
+        isOpen={showCategoryForm}
+        categories={categories}
+        onAddCategory={handleAddCategory}
+        onDeleteCategory={handleDeleteCategory}
+        onClose={toggleCategoryForm}
+      />
 
       <PhotoGrid 
         photos={filteredPhotos}

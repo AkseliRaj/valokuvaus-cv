@@ -14,6 +14,7 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [randomSeed, setRandomSeed] = useState(Math.random());
 
   // Fetch photos from database
   useEffect(() => {
@@ -70,6 +71,25 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     setUpdateCallback(updateScrollPosition);
   }, [setUpdateCallback, updateScrollPosition]);
 
+  // Seeded random function for consistent randomization
+  const seededRandom = useCallback((seed) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  }, []);
+
+  // Get random photo for a specific grid position
+  const getRandomPhotoForPosition = useCallback((row, col) => {
+    if (photos.length === 0) return null;
+    
+    // Create a unique seed for each position using row, col, and global random seed
+    const positionSeed = (row * 73856093) ^ (col * 19349663) ^ (randomSeed * 83492791);
+    const randomValue = seededRandom(positionSeed);
+    
+    // Use the random value to select a photo
+    const photoIndex = Math.floor(randomValue * photos.length);
+    return photos[photoIndex];
+  }, [photos, randomSeed, seededRandom]);
+
   // Calculate which photos should be visible based on viewport
   const visiblePhotos = useMemo(() => {
     if (loading || photos.length === 0) {
@@ -100,9 +120,8 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     // Create photos for the extended visible area
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
-        // Only add one photo per cell for better performance
-        const photoIndex = Math.abs(row + col) % photos.length;
-        const photo = photos[photoIndex];
+        // Get a random photo for this position
+        const photo = getRandomPhotoForPosition(row, col);
         
         if (photo) {
           visible.push({
@@ -124,7 +143,7 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     }
     
     return visible;
-  }, [gridConfig, scrollPosition, viewport, photos, loading]);
+  }, [gridConfig, scrollPosition, viewport, photos, loading, getRandomPhotoForPosition]);
 
   // Update viewport size with more accurate calculation
   useEffect(() => {
@@ -167,6 +186,11 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
   const handleModalClose = useCallback(() => {
     setIsModalOpen(false);
     setModalPhoto(null);
+  }, []);
+
+  // Function to refresh randomization (can be called from parent if needed)
+  const refreshRandomization = useCallback(() => {
+    setRandomSeed(Math.random());
   }, []);
 
   if (loading) {

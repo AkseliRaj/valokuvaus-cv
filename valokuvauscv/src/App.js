@@ -12,7 +12,7 @@ const Gallery = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filterType, setFilterType] = useState(null);
+  const [filterType, setFilterType] = useState('colored');
   const navigate = useNavigate();
 
   const containerRef = useRef(null);

@@ -4,7 +4,7 @@ import ImageModal from './ImageModal';
 import { basePhotos } from '../data/photoData';
 import './InfiniteGrid.css';
 
-const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallback, dragDistance, onModalStateChange, isDragging, filterType = null }) => {
+const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallback, dragDistance, onModalStateChange, isDragging, filterType = 'colored' }) => {
   const gridRef = useRef(null);
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
   const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 });
@@ -75,7 +75,7 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
         photo.metadata && (photo.metadata.is_black_white === true || photo.metadata.is_black_white === 'true' || photo.metadata.is_black_white === 1)
       );
     } else {
-      // When no filter is selected (null), show all photos
+      // Fallback: show all photos if filterType is null or undefined
       filteredPhotos = allPhotos;
     }
     

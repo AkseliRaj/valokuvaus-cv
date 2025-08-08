@@ -158,6 +158,7 @@ const Gallery = () => {
         setUpdateCallback={setUpdateCallback}
         dragDistance={dragDistance}
         onModalStateChange={setIsModalOpen}
+        isDragging={isDragging}
       />
       <InstructionsOverlay />
 

@@ -11,7 +11,10 @@
   min-height: 100vh;
   /* Add padding to ensure content doesn't get clipped */
   padding: 200px;
+  transition: opacity 0.3s ease;
 }
+
+
 
 .photo-card {
   position: absolute;
@@ -19,6 +22,42 @@
   transform: translateZ(0); /* Hardware acceleration */
   /* Ensure photos don't get clipped */
   overflow: visible;
+  transition: all 0.4s ease;
+  animation: photoAppear 0.5s ease-out;
+}
+
+.photo-card.filter-transition {
+  animation: photoFilterTransition 0.6s ease-in-out;
+}
+
+@keyframes photoAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes photoFilterTransition {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    opacity: 0.3;
+    transform: scale(0.9) rotate(-2deg);
+  }
+  75% {
+    opacity: 0.3;
+    transform: scale(0.9) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
 }
 
 .photo-wrapper {
@@ -28,12 +67,13 @@
   overflow: hidden;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
   background-color: #4e4e4e; /* Placeholder background */
 }
 
 .photo-wrapper:hover {
   transform: scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .photo-image {

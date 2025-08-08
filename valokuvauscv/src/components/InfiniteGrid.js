@@ -16,6 +16,8 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
   const [allPhotos, setAllPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [randomSeed, setRandomSeed] = useState(Math.random());
+  const [isFilterChanging, setIsFilterChanging] = useState(false);
+  const [previousFilterType, setPreviousFilterType] = useState(filterType);
 
   // Fetch photos from database
   useEffect(() => {
@@ -81,6 +83,19 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     
     setPhotos(filteredPhotos);
   }, [allPhotos, filterType]);
+
+  // Handle filter change animations
+  useEffect(() => {
+    if (filterType !== previousFilterType) {
+      setIsFilterChanging(true);
+      setPreviousFilterType(filterType);
+      
+      // Remove animation class after animation completes
+      setTimeout(() => {
+        setIsFilterChanging(false);
+      }, 600);
+    }
+  }, [filterType, previousFilterType]);
 
   // Simplified scroll position update
   const updateScrollPosition = useCallback((newPosition) => {
@@ -248,6 +263,7 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
             onPhotoClick={handlePhotoClick}
             dragDistance={dragDistance}
             isDragging={isDragging}
+            isFilterChanging={isFilterChanging}
           />
         ))}
       </div>

@@ -1,4 +1,35 @@
-/* Reset and base styles */
+/* CSS Variables for theming */
+:root {
+  --bg-color: #000000;
+  --text-color: #ffffff;
+  --overlay-bg: rgba(0, 0, 0, 0.4);
+  --button-bg: rgba(0, 0, 0, 0.4);
+  --button-border: rgba(255, 255, 255, 0.3);
+  --button-hover-bg: rgba(0, 0, 0, 0.5);
+  --button-active-bg: rgba(0, 0, 0, 0.6);
+  --button-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --button-hover-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --square-bg: #000000;
+  --square-color: rgba(255, 255, 255, 0.1);
+  --square-space: 45px;
+}
+
+/* Light theme variables */
+[data-theme="light"] {
+  --bg-color: #dbdbdb;
+  --text-color: #8d8d8d;
+  --overlay-bg: rgba(255, 255, 255, 0.9);
+  --button-bg: rgba(255, 255, 255, 0.8);
+  --button-border: rgba(0, 0, 0, 0.2);
+  --button-hover-bg: rgba(255, 255, 255, 0.9);
+  --button-active-bg: rgba(255, 255, 255, 1);
+  --button-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --button-hover-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  --square-bg: #dbdbdb;
+  --square-color: rgba(0, 0, 0, 0.1);
+  --square-space: 45px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -11,54 +42,45 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #242424;
-  color: #242424;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
   overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
-/* Allow scrolling for admin pages */
 body.admin-page-active {
-  overflow: hidden;
-  height: 100vh;
+  overflow: auto;
+  user-select: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
 }
 
-/* Override App styles for admin pages */
 body.admin-page-active .App {
-  overflow: hidden;
-  height: 100vh;
-  position: relative;
+  cursor: default;
+  overflow: visible;
 }
 
-/* Ensure admin page content can scroll */
 body.admin-page-active .admin-page {
-  overflow-y: auto;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
+  display: block;
 }
 
 body.admin-page-active .admin-panel {
-  overflow: visible;
-  height: auto;
+  display: block;
 }
 
 .App {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #242424;
   position: relative;
-  user-select: none;
-  touch-action: none;
   cursor: grab;
-  --square-bg: #242424;
-  --square-color: rgba(91, 91, 91, 0.3);
-  --square-size: 0.5px;
-  --square-space: 45px;
+  background-color: var(--bg-color);
+  transition: background-color 0.3s ease;
   background:
     linear-gradient(90deg, var(--square-color) 1px, transparent 1px) center / var(--square-space) var(--square-space),
     linear-gradient(var(--square-color) 1px, transparent 1px) center / var(--square-space) var(--square-space),
@@ -66,33 +88,23 @@ body.admin-page-active .admin-panel {
   background-attachment: local;
 }
 
-/* Override touch-action for admin pages */
 body.admin-page-active .App {
-  touch-action: auto;
-  cursor: auto;
+  cursor: default;
+  overflow: visible;
 }
 
 .App:active {
   cursor: grabbing;
 }
 
-/* Prevent text selection during dragging */
 .App * {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  cursor: inherit;
 }
 
-/* Allow text selection and scrolling on admin pages */
 body.admin-page-active .App * {
-  -webkit-user-select: auto;
-  -moz-user-select: auto;
-  -ms-user-select: auto;
-  user-select: auto;
+  cursor: auto;
 }
 
-/* Login button container */
 .login-button-container {
   position: fixed;
   top: 20px;
@@ -108,19 +120,19 @@ body.admin-page-active .App * {
   font-weight: 500;
   font-size: 13px;
   transition: all 0.2s ease;
-  background: rgba(0, 0, 0, 0.4);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--button-bg);
+  color: var(--text-color);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--button-border);
+  box-shadow: var(--button-shadow);
 }
 
 .login-btn:hover {
-  background: rgba(0, 0, 0, 0.5);
-  color: rgba(255, 255, 255, 1);
+  background: var(--button-hover-bg);
+  color: var(--text-color);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--button-hover-shadow);
 }
 
 /* Admin controls */
@@ -142,19 +154,19 @@ body.admin-page-active .App * {
   font-weight: 500;
   font-size: 13px;
   transition: all 0.2s ease;
-  background: rgba(0, 0, 0, 0.4);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--button-bg);
+  color: var(--text-color);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--button-border);
+  box-shadow: var(--button-shadow);
 }
 
 .admin-btn:hover {
-  background: rgba(0, 0, 0, 0.5);
-  color: rgba(255, 255, 255, 1);
+  background: var(--button-hover-bg);
+  color: var(--text-color);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .logout-btn {
@@ -197,6 +209,69 @@ body.admin-page-active .App * {
   overflow-y: auto;
 }
 
+.login-modal h2 {
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.login-form button {
+  padding: 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.login-form button:hover {
+  background: #0056b3;
+}
+
+.login-form button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 10px;
+}
+
 .close-modal-btn {
   position: absolute;
   top: 15px;
@@ -212,10 +287,80 @@ body.admin-page-active .App * {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .close-modal-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: #f0f0f0;
+}
+
+/* Confirmation overlay */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.confirmation-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.confirmation-modal h3 {
+  margin-bottom: 15px;
   color: #333;
+}
+
+.confirmation-modal p {
+  margin-bottom: 25px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.cancel-btn,
+.confirm-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #5a6268;
+}
+
+.confirm-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.confirm-btn:hover {
+  background: #c82333;
 }

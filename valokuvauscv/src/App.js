@@ -43,6 +43,12 @@ const Gallery = () => {
     }
   }, []);
 
+  // Set initial theme based on default filter
+  useEffect(() => {
+    // Default to light theme since we default to 'colored' filter
+    document.documentElement.setAttribute('data-theme', 'light');
+  }, []);
+
   // Cleanup on unmount
   useEffect(() => {
     return cleanup;
@@ -118,6 +124,13 @@ const Gallery = () => {
 
   const handleFilterChange = useCallback((newFilterType) => {
     setFilterType(newFilterType);
+    
+    // Apply theme based on filter selection
+    if (newFilterType === 'colored') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else if (newFilterType === 'black_white') {
+      document.documentElement.removeAttribute('data-theme');
+    }
   }, []);
 
   // Memoized cursor style

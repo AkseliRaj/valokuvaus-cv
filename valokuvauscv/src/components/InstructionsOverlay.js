@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './InstructionsOverlay.css';
 
 const InstructionsOverlay = ({ filterType, onFilterChange }) => {
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const toggleFilter = () => {
     setIsFilterExpanded(!isFilterExpanded);
   };
 
+  const handleFilterClick = (newFilterType) => {
+    if (newFilterType !== filterType) {
+      setIsAnimating(true);
+      onFilterChange(newFilterType);
+      
+      // Remove animation class after animation completes
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 400);
+    }
+  };
+
   return (
     <div className="instructions-overlay">
-      <div className="instructions-content">
+      <div className={`instructions-content ${isAnimating ? 'filter-changing' : ''}`}>
         <div className="instructions-header">
           <h2>Photography Portfolio</h2>
           <button 
@@ -29,13 +42,13 @@ const InstructionsOverlay = ({ filterType, onFilterChange }) => {
             <div className="filter-options">
               <button 
                 className={`filter-btn ${filterType === 'colored' ? 'active' : ''}`}
-                onClick={() => onFilterChange('colored')}
+                onClick={() => handleFilterClick('colored')}
               >
                 Colored
               </button>
               <button 
                 className={`filter-btn ${filterType === 'black_white' ? 'active' : ''}`}
-                onClick={() => onFilterChange('black_white')}
+                onClick={() => handleFilterClick('black_white')}
               >
                 Black & White
               </button>

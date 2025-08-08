@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import './PhotoCard.css';
 
-const PhotoCard = React.memo(({ photo, style, onPhotoClick, dragDistance, isDragging }) => {
+const PhotoCard = React.memo(({ photo, style, onPhotoClick, dragDistance, isDragging, isFilterChanging }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [hasDragged, setHasDragged] = useState(false);
@@ -71,7 +71,7 @@ const PhotoCard = React.memo(({ photo, style, onPhotoClick, dragDistance, isDrag
   }, [dragDistance, hasDragged, isDragging, onPhotoClick, photo]);
 
   return (
-    <div className="photo-card" ref={cardRef} style={memoizedStyle}>
+    <div className={`photo-card ${isFilterChanging ? 'filter-transition' : ''}`} ref={cardRef} style={memoizedStyle}>
       <div className="photo-wrapper" onClick={handleClick}>
         {isVisible && (
           <img 

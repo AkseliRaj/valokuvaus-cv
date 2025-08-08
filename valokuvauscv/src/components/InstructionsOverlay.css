@@ -8,16 +8,17 @@
 }
 
 .instructions-content {
-  background: rgba(0, 0, 0, 0.4);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--overlay-bg);
+  color: var(--text-color);
   padding: 1rem 1.5rem;
   border-radius: 8px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--button-border);
+  box-shadow: var(--button-shadow);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   pointer-events: auto;
+  transition: all 0.3s ease;
 }
 
 .instructions-header {
@@ -31,24 +32,24 @@
   font-size: 1.2rem;
   font-weight: 700;
   margin: 0;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--text-color);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
 .filter-toggle-btn {
-  padding: 16px 8px;
+  padding: 6px 8px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
   font-size: 12px;
   transition: all 0.2s ease;
-  background: rgba(0, 0, 0, 0.4) !important;
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--button-bg) !important;
+  color: var(--text-color);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--button-border) !important;
+  box-shadow: var(--button-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,10 +59,10 @@
 }
 
 .filter-toggle-btn:hover {
-  background: rgba(0, 0, 0, 0.5) !important;
-  color: rgba(255, 255, 255, 1);
+  background: var(--button-hover-bg) !important;
+  color: var(--text-color);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .filter-toggle-btn.expanded .arrow {
@@ -75,7 +76,7 @@
 
 .instructions-content p {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text-color);
   margin: 0;
   font-weight: 500;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
@@ -84,7 +85,7 @@
 .filter-section {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid var(--button-border);
   animation: slideDown 0.3s ease-out;
 }
 
@@ -103,7 +104,7 @@
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 0.8rem;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--text-color);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
@@ -120,27 +121,77 @@
   cursor: pointer;
   font-weight: 500;
   font-size: 13px;
-  transition: all 0.2s ease;
-  background: rgba(0, 0, 0, 0.4) !important;
-  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+  background: var(--button-bg) !important;
+  color: var(--text-color);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--button-border) !important;
+  box-shadow: var(--button-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.instructions-content .filter-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.instructions-content .filter-btn:hover::before {
+  left: 100%;
 }
 
 .instructions-content .filter-btn:hover {
-  background: rgba(0, 0, 0, 0.5) !important;
-  color: rgba(255, 255, 255, 1);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  background: var(--button-hover-bg) !important;
+  color: var(--text-color);
+  transform: translateY(-2px);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .instructions-content .filter-btn.active {
-  background: rgba(0, 0, 0, 0.6) !important;
-  color: rgba(255, 255, 255, 1);
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  background: var(--button-active-bg) !important;
+  color: var(--text-color);
+  border-color: var(--button-border) !important;
+  box-shadow: var(--button-hover-shadow);
+  animation: filterPulse 0.6s ease-out;
+}
+
+@keyframes filterPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Filter change animation for the entire overlay */
+.instructions-content.filter-changing {
+  animation: filterChange 0.4s ease-in-out;
+}
+
+@keyframes filterChange {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.98);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Responsive design for smaller screens */

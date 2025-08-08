@@ -57,8 +57,9 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     fetchPhotos();
   }, []);
 
-  // Update scroll position without triggering re-renders
+  // Simplified scroll position update
   const updateScrollPosition = useCallback((newPosition) => {
+    // Only update if position changed significantly
     if (Math.abs(newPosition.x - lastScrollRef.current.x) > 5 || 
         Math.abs(newPosition.y - lastScrollRef.current.y) > 5) {
       lastScrollRef.current = newPosition;
@@ -100,8 +101,8 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     const cellWidth = photoWidth + gap;
     const cellHeight = photoHeight + gap;
     
-    // Use a much larger buffer to ensure no cutoff
-    const buffer = 8; // Significantly increased buffer
+    // Use a reasonable buffer to ensure no cutoff
+    const buffer = 6; // Reduced buffer for better performance
     
     // Calculate the visible area with extra padding
     const visibleLeft = -scrollPosition.x - (buffer * cellWidth);
@@ -142,7 +143,8 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
       }
     }
     
-    return visible;
+    // Limit the number of visible photos to prevent performance issues
+    return visible.slice(0, 200); // Limit to 200 photos max
   }, [gridConfig, scrollPosition, viewport, photos, loading, getRandomPhotoForPosition]);
 
   // Update viewport size with more accurate calculation
@@ -159,7 +161,7 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
     return () => window.removeEventListener('resize', updateViewport);
   }, []);
 
-  // Direct DOM manipulation for transform
+  // Optimized DOM manipulation for transform
   useEffect(() => {
     if (gridRef.current) {
       if (animationFrameRef.current) {
@@ -167,7 +169,9 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
       }
       
       animationFrameRef.current = requestAnimationFrame(() => {
-        gridRef.current.style.transform = `translate(${scrollPosition.x}px, ${scrollPosition.y}px)`;
+        if (gridRef.current) {
+          gridRef.current.style.transform = `translate(${scrollPosition.x}px, ${scrollPosition.y}px)`;
+        }
       });
     }
     

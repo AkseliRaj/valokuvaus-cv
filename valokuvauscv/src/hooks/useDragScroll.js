@@ -6,10 +6,9 @@ export const useDragScroll = () => {
   const [dragDistance, setDragDistance] = useState(0);
   const scrollPositionRef = useRef({ x: 0, y: 0 });
   const animationFrameRef = useRef(null);
-  const lastUpdateRef = useRef(0);
   const updateCallbackRef = useRef(null);
 
-  // Use ref for scroll position to avoid re-renders
+  // Direct scroll position update without excessive batching
   const setScrollPosition = useCallback((newPosition) => {
     scrollPositionRef.current = newPosition;
     if (updateCallbackRef.current) {
@@ -17,7 +16,7 @@ export const useDragScroll = () => {
     }
   }, []);
 
-  // Throttled update function using requestAnimationFrame
+  // Simple throttled update using requestAnimationFrame
   const throttledUpdate = useCallback((newPosition) => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -29,7 +28,7 @@ export const useDragScroll = () => {
   }, [setScrollPosition]);
 
   // Mouse event handlers for dragging
-  const handleMouseDown = (e) => {
+  const handleMouseDown = useCallback((e) => {
     setIsDragging(true);
     setDragDistance(0);
     setDragStart({
@@ -37,13 +36,10 @@ export const useDragScroll = () => {
       y: e.clientY - scrollPositionRef.current.y
     });
     e.preventDefault();
-  };
+  }, []);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = useCallback((e) => {
     if (!isDragging) return;
-    
-    const now = performance.now();
-    if (now - lastUpdateRef.current < 32) return; // ~30fps throttling
     
     const newX = e.clientX - dragStart.x;
     const newY = e.clientY - dragStart.y;
@@ -55,18 +51,18 @@ export const useDragScroll = () => {
     );
     setDragDistance(distance);
     
-    throttledUpdate({ x: newX, y: newY });
-    lastUpdateRef.current = now;
-  };
+    // Direct update for smoother dragging
+    setScrollPosition({ x: newX, y: newY });
+  }, [isDragging, dragStart, setScrollPosition]);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     setIsDragging(false);
     // Keep drag distance for a short time to prevent click events
     setTimeout(() => setDragDistance(0), 100);
-  };
+  }, []);
 
   // Touch event handlers for mobile
-  const handleTouchStart = (e) => {
+  const handleTouchStart = useCallback((e) => {
     const touch = e.touches[0];
     setIsDragging(true);
     setDragDistance(0);
@@ -74,9 +70,9 @@ export const useDragScroll = () => {
       x: touch.clientX - scrollPositionRef.current.x,
       y: touch.clientY - scrollPositionRef.current.y
     });
-  };
+  }, []);
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = useCallback((e) => {
     if (!isDragging) return;
     
     const touch = e.touches[0];
@@ -90,41 +86,46 @@ export const useDragScroll = () => {
     );
     setDragDistance(distance);
     
-    throttledUpdate({ x: newX, y: newY });
-  };
+    // Direct update for smoother touch dragging
+    setScrollPosition({ x: newX, y: newY });
+  }, [isDragging, dragStart, setScrollPosition]);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     setIsDragging(false);
     // Keep drag distance for a short time to prevent click events
     setTimeout(() => setDragDistance(0), 100);
-  };
+  }, []);
 
   // Wheel event for zoom-like scrolling
-  const handleWheel = (e) => {
+  const handleWheel = useCallback((e) => {
     const deltaX = e.deltaX || 0;
     const deltaY = e.deltaY || 0;
     
+    // Apply wheel sensitivity for smoother scrolling
+    const sensitivity = 1.2;
     const newPosition = {
-      x: scrollPositionRef.current.x - deltaX,
-      y: scrollPositionRef.current.y - deltaY
+      x: scrollPositionRef.current.x - (deltaX * sensitivity),
+      y: scrollPositionRef.current.y - (deltaY * sensitivity)
     };
-    setScrollPosition(newPosition);
-  };
+    
+    // Use throttled update for wheel events to prevent excessive updates
+    throttledUpdate(newPosition);
+  }, [throttledUpdate]);
 
   // Cleanup animation frame on unmount
-  const cleanup = () => {
+  const cleanup = useCallback(() => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
     }
-  };
+  }, []);
 
   // Function to get current scroll position
-  const getScrollPosition = () => scrollPositionRef.current;
+  const getScrollPosition = useCallback(() => scrollPositionRef.current, []);
 
   // Function to set update callback
-  const setUpdateCallback = (callback) => {
+  const setUpdateCallback = useCallback((callback) => {
     updateCallbackRef.current = callback;
-  };
+  }, []);
 
   return {
     getScrollPosition,

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import InfiniteGrid from './components/InfiniteGrid';
 import InstructionsOverlay from './components/InstructionsOverlay';
@@ -47,32 +47,33 @@ const Gallery = () => {
     return cleanup;
   }, [cleanup]);
 
+  // Optimized event handlers with useCallback
+  const wheelHandler = useCallback((e) => {
+    if (isModalOpen) return; // Disable wheel when modal is open
+    e.preventDefault();
+    handleWheel(e);
+  }, [isModalOpen, handleWheel]);
+  
+  const touchStartHandler = useCallback((e) => {
+    if (isModalOpen) return; // Disable touch when modal is open
+    handleTouchStart(e);
+  }, [isModalOpen, handleTouchStart]);
+  
+  const touchMoveHandler = useCallback((e) => {
+    if (isModalOpen) return; // Disable touch when modal is open
+    e.preventDefault();
+    handleTouchMove(e);
+  }, [isModalOpen, handleTouchMove]);
+  
+  const touchEndHandler = useCallback((e) => {
+    if (isModalOpen) return; // Disable touch when modal is open
+    handleTouchEnd(e);
+  }, [isModalOpen, handleTouchEnd]);
+
   // Add event listeners with proper options
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
-      const wheelHandler = (e) => {
-        if (isModalOpen) return; // Disable wheel when modal is open
-        e.preventDefault();
-        handleWheel(e);
-      };
-      
-      const touchStartHandler = (e) => {
-        if (isModalOpen) return; // Disable touch when modal is open
-        handleTouchStart(e);
-      };
-      
-      const touchMoveHandler = (e) => {
-        if (isModalOpen) return; // Disable touch when modal is open
-        e.preventDefault();
-        handleTouchMove(e);
-      };
-      
-      const touchEndHandler = (e) => {
-        if (isModalOpen) return; // Disable touch when modal is open
-        handleTouchEnd(e);
-      };
-      
       // Use non-passive event listeners for wheel and touch events
       container.addEventListener('wheel', wheelHandler, { passive: false });
       container.addEventListener('touchstart', touchStartHandler, { passive: true });
@@ -86,33 +87,39 @@ const Gallery = () => {
         container.removeEventListener('touchend', touchEndHandler);
       };
     }
-  }, [handleWheel, handleTouchStart, handleTouchMove, handleTouchEnd]);
+  }, [wheelHandler, touchStartHandler, touchMoveHandler, touchEndHandler]);
 
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     setShowLogoutConfirmation(true);
-  };
+  }, []);
 
-  const confirmLogout = () => {
+  const confirmLogout = useCallback(() => {
     setIsAuthenticated(false);
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setShowLogoutConfirmation(false);
-  };
+  }, []);
 
-  const cancelLogout = () => {
+  const cancelLogout = useCallback(() => {
     setShowLogoutConfirmation(false);
-  };
+  }, []);
 
-  const goToAdmin = () => {
+  const goToAdmin = useCallback(() => {
     navigate('/admin');
-  };
+  }, [navigate]);
 
-  const goToGallery = () => {
+  const goToGallery = useCallback(() => {
     navigate('/');
-  };
+  }, [navigate]);
+
+  // Memoized cursor style
+  const cursorStyle = useMemo(() => {
+    if (isModalOpen) return 'default';
+    return isDragging ? 'grabbing' : 'grab';
+  }, [isModalOpen, isDragging]);
 
   return (
     <div 
@@ -122,7 +129,7 @@ const Gallery = () => {
       onMouseMove={isModalOpen ? undefined : handleMouseMove}
       onMouseUp={isModalOpen ? undefined : handleMouseUp}
       onMouseLeave={isModalOpen ? undefined : handleMouseUp}
-      style={{ cursor: isModalOpen ? 'default' : (isDragging ? 'grabbing' : 'grab') }}
+      style={{ cursor: cursorStyle }}
     >
       {/* Admin button for authenticated users */}
       {isAuthenticated && (

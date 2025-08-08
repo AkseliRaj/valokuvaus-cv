@@ -286,8 +286,9 @@
 
 .file-setting select {
   padding: 12px;
-  background-color: #ffffff;
-  border: 2px solid #ffffff;
+  background-color: #4e4e4e;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
   border-radius: 6px;
   font-size: 14px;
   transition: border-color 0.3s ease;

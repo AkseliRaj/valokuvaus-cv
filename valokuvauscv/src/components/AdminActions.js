@@ -10,18 +10,20 @@ const AdminActions = ({
 }) => {
   return (
     <div className="admin-actions">
-      <button 
-        onClick={onToggleUpload}
-        className="upload-btn"
-      >
-        Upload New Photo
-      </button>
-      <button 
-        onClick={onToggleBulkUpload}
-        className="bulk-upload-btn"
-      >
-        Bulk Upload Photos
-      </button>
+      <div className="upload-buttons-row">
+        <button 
+          onClick={onToggleUpload}
+          className="upload-btn"
+        >
+          Upload New Photo
+        </button>
+        <button 
+          onClick={onToggleBulkUpload}
+          className="bulk-upload-btn"
+        >
+          Bulk Upload Photos
+        </button>
+      </div>
       <button 
         onClick={onToggleCategories}
         className="category-btn"

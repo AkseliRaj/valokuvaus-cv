@@ -4,7 +4,7 @@ import ImageModal from './ImageModal';
 import { basePhotos } from '../data/photoData';
 import './InfiniteGrid.css';
 
-const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallback, dragDistance, onModalStateChange, isDragging }) => {
+const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallback, dragDistance, onModalStateChange, isDragging, filterType = null }) => {
   const gridRef = useRef(null);
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
   const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 });
@@ -13,6 +13,7 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
   const [modalPhoto, setModalPhoto] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [photos, setPhotos] = useState([]);
+  const [allPhotos, setAllPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [randomSeed, setRandomSeed] = useState(Math.random());
 
@@ -40,22 +41,46 @@ const InfiniteGrid = React.memo(({ gridConfig, getScrollPosition, setUpdateCallb
               category_name: photo.category_name
             }
           }));
-          setPhotos(transformedPhotos);
+          setAllPhotos(transformedPhotos);
         } else {
           // Fallback to static photos if API fails
-          setPhotos(basePhotos);
+          setAllPhotos(basePhotos);
         }
-      } catch (error) {
-        console.error('Failed to fetch photos:', error);
-        // Fallback to static photos
-        setPhotos(basePhotos);
-      } finally {
-        setLoading(false);
-      }
+              } catch (error) {
+          console.error('Failed to fetch photos:', error);
+          // Fallback to static photos
+          setAllPhotos(basePhotos);
+        } finally {
+          setLoading(false);
+        }
     };
 
     fetchPhotos();
   }, []);
+
+  // Filter photos based on filterType
+  useEffect(() => {
+    if (allPhotos.length === 0) {
+      setPhotos([]);
+      return;
+    }
+
+    let filteredPhotos;
+    if (filterType === 'colored') {
+      filteredPhotos = allPhotos.filter(photo => 
+        photo.metadata && (photo.metadata.is_black_white === false || photo.metadata.is_black_white === 'false')
+      );
+    } else if (filterType === 'black_white') {
+      filteredPhotos = allPhotos.filter(photo => 
+        photo.metadata && (photo.metadata.is_black_white === true || photo.metadata.is_black_white === 'true' || photo.metadata.is_black_white === 1)
+      );
+    } else {
+      // When no filter is selected (null), show all photos
+      filteredPhotos = allPhotos;
+    }
+    
+    setPhotos(filteredPhotos);
+  }, [allPhotos, filterType]);
 
   // Simplified scroll position update
   const updateScrollPosition = useCallback((newPosition) => {

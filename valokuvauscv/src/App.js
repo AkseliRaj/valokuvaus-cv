@@ -12,6 +12,7 @@ const Gallery = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filterType, setFilterType] = useState(null);
   const navigate = useNavigate();
 
   const containerRef = useRef(null);
@@ -115,6 +116,10 @@ const Gallery = () => {
     navigate('/');
   }, [navigate]);
 
+  const handleFilterChange = useCallback((newFilterType) => {
+    setFilterType(newFilterType);
+  }, []);
+
   // Memoized cursor style
   const cursorStyle = useMemo(() => {
     if (isModalOpen) return 'default';
@@ -159,8 +164,12 @@ const Gallery = () => {
         dragDistance={dragDistance}
         onModalStateChange={setIsModalOpen}
         isDragging={isDragging}
+        filterType={filterType}
       />
-      <InstructionsOverlay />
+      <InstructionsOverlay 
+        filterType={filterType}
+        onFilterChange={handleFilterChange}
+      />
 
       {/* Logout confirmation */}
       {showLogoutConfirmation && (

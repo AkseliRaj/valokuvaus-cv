@@ -6,6 +6,7 @@ import './AdminPanel.css';
 import AdminHeader from './AdminHeader';
 import AdminActions from './AdminActions';
 import UploadModal from './UploadModal';
+import BulkUploadModal from './BulkUploadModal';
 import CategoryManager from './CategoryManager';
 import PhotoGrid from './PhotoGrid';
 import EditPhotoModal from './EditPhotoModal';
@@ -19,6 +20,7 @@ const AdminPanel = ({ onLogout }) => {
   
   // UI state
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [editingPhoto, setEditingPhoto] = useState(null);
@@ -143,6 +145,31 @@ const AdminPanel = ({ onLogout }) => {
     setShowUploadModal(false); // Close modal after successful upload
   };
 
+  // Bulk upload handlers
+  const handleBulkUpload = async (formData) => {
+    const response = await fetch('http://localhost:5000/api/photos', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Upload failed');
+    }
+
+    // Don't close modal here as we're uploading multiple files
+    // The modal will be closed after all uploads are complete
+  };
+
+  // Bulk upload completion handler
+  const handleBulkUploadComplete = () => {
+    fetchPhotos(); // Refresh the photos list
+    setShowBulkUploadModal(false); // Close the modal
+  };
+
   // Delete handlers
   const handleDelete = async (id) => {
     try {
@@ -265,6 +292,8 @@ const AdminPanel = ({ onLogout }) => {
   // UI toggle handlers
   const openUploadModal = () => setShowUploadModal(true);
   const closeUploadModal = () => setShowUploadModal(false);
+  const openBulkUploadModal = () => setShowBulkUploadModal(true);
+  const closeBulkUploadModal = () => setShowBulkUploadModal(false);
   const toggleCategoryForm = () => setShowCategoryForm(!showCategoryForm);
   const toggleFilters = () => setShowFilters(!showFilters);
 
@@ -285,6 +314,7 @@ const AdminPanel = ({ onLogout }) => {
         showUploadForm={showUploadModal}
         showCategoryForm={showCategoryForm}
         onToggleUpload={openUploadModal}
+        onToggleBulkUpload={openBulkUploadModal}
         onToggleCategories={toggleCategoryForm}
       />
 
@@ -293,6 +323,14 @@ const AdminPanel = ({ onLogout }) => {
         onClose={closeUploadModal}
         categories={categories}
         onUpload={handleUpload}
+      />
+
+      <BulkUploadModal 
+        isOpen={showBulkUploadModal}
+        onClose={closeBulkUploadModal}
+        categories={categories}
+        onUpload={handleBulkUpload}
+        onComplete={handleBulkUploadComplete}
       />
 
       <CategoryManager 

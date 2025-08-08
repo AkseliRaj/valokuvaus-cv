@@ -5,6 +5,7 @@ const AdminActions = ({
   showUploadForm, 
   showCategoryForm,
   onToggleUpload, 
+  onToggleBulkUpload,
   onToggleCategories
 }) => {
   return (
@@ -14,6 +15,12 @@ const AdminActions = ({
         className="upload-btn"
       >
         Upload New Photo
+      </button>
+      <button 
+        onClick={onToggleBulkUpload}
+        className="bulk-upload-btn"
+      >
+        Bulk Upload Photos
       </button>
       <button 
         onClick={onToggleCategories}

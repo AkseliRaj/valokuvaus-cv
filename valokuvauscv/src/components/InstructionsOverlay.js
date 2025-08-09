@@ -25,17 +25,17 @@ const InstructionsOverlay = ({ filterType, onFilterChange }) => {
     <div className="instructions-overlay">
       <div className={`instructions-content ${isAnimating ? 'filter-changing' : ''}`}>
         <div className="instructions-header">
-          <h2>Photography Portfolio</h2>
-          <button 
+          <h2>Akseli Rajahalme - Portfolio</h2>
+        </div>
+        <p>Drag to scroll • Touch to navigate</p>
+        <button 
             className={`filter-toggle-btn ${isFilterExpanded ? 'expanded' : ''}`}
             onClick={toggleFilter}
             aria-label="Toggle filter options"
           >
             <span className="arrow">▼</span>
           </button>
-        </div>
-        <p>Drag to scroll • Scroll wheel to zoom • Touch to navigate</p>
-        
+
         {isFilterExpanded && (
           <div className="filter-section">
             <h3>Filter Photos</h3>
